@@ -4,6 +4,9 @@ import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class Pusher {
 
     public static void main(String[] args) {
@@ -14,7 +17,7 @@ public class Pusher {
              pusher.connect("tcp://localhost:5558"); // Uncomment if puller runs on different machine
             // Bind the socket to a port (useful if puller connects)
             pusher.bind("tcp://*:5558");
-
+            
             while (!Thread.currentThread().isInterrupted()) {
                 // Send messages
                 for (int i = 0; i < 5; i++) {

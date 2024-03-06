@@ -18,11 +18,21 @@ public class Publisher
                 publishers[i].bind("tcp://*:555"+i);
             }
 
+            ZMQ.Socket puller = context.createSocket(SocketType.PULL);
+            puller.connect("tcp://localhost:6660");
+            puller.connect("tcp://localhost:6661");
+            puller.connect("tcp://localhost:6662");
+            Thread.sleep(2000);
             while(true){
                 for(int i=0; i<3; ++i){
-                    String sendMessage = "message from publisher port :555"+i;
+                    String sendMessage = "message from publisher port :";
 
-                    publishers[i].send(sendMessage.getBytes(ZMQ.CHARSET));
+                    publishers[i].sendMore(sendMessage.getBytes(ZMQ.CHARSET));
+                    publishers[i].send(("555"+i).getBytes(ZMQ.CHARSET));
+                    System.out.println("hi");
+
+                    byte[] Ack = puller.recv(0);
+                    System.out.println("555"+i + new String(Ack,ZMQ.CHARSET));
 
                     Thread.sleep(1000);
                 }
