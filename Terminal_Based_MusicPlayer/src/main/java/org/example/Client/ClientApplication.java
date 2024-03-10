@@ -8,9 +8,7 @@ public class ClientApplication
         String serverIP = "localhost";
 
         ClientSocket clientSocket = new ClientSocket(serverIP,port);
-
-        TerminalUI terminalUI = new TerminalUI(clientSocket);
-        terminalUI.start();
+        clientSocket.connect();
 
     }
 }

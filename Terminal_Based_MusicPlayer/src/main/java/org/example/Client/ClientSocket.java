@@ -23,9 +23,15 @@ public class ClientSocket
         try{
             socket = new Socket(serverIP,serverPort);
 
-            try(BufferedReader receive = new BufferedReader(new InputStreamReader(socket.getInputStream()));){
-                System.out.println(receive.readLine());
-            }
+            ClientRequestHandler requestHandler = new ClientRequestHandler(socket);
+
+            TerminalUI terminalUI = new TerminalUI(this, requestHandler);
+
+            terminalUI.start();
+
+//            try(BufferedReader receive = new BufferedReader(new InputStreamReader(socket.getInputStream()));){
+//                System.out.println(receive.readLine());
+//            }
         } catch(IOException e)
         {
             throw new RuntimeException(e);
