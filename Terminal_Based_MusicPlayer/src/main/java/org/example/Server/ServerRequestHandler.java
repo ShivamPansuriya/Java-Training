@@ -28,41 +28,9 @@ public class ServerRequestHandler
 
     }
 
-    public void Hello()
-    {
-
-        new Thread(() -> {
-            try(BufferedReader receive = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));)
-            {
-                while(true)
-                {
-                    String request = receive.readLine();
-
-                    if(request.equals("exit"))break;
-
-                    switch(request)
-                    {
-                        case "library":
-                            sendLibrary();
-                            break;
-
-                        case "audioFile":
-                            request = receive.readLine();
-                            sendAudioFile(request);
-                            break;
-                    }
-                }
-            } catch(IOException e)
-            {
-                throw new RuntimeException(e);
-            }
-        }).start();
-
-    }
-
     public void sendLibrary()
     {
-        var files = ServerApplication.musicLibrary.getAudioFilename();
+        List<String> files = ServerApplication.musicLibrary.getAudioFilename();
 
         try
         {
@@ -77,5 +45,20 @@ public class ServerRequestHandler
         audioStreamer.sendAudioToClient(audioName);
     }
 
+    public void createPlaylist(String playlistName)
+    {
+        ServerApplication.musicLibrary.createPlaylist(playlistName);
+    }
+
+    public void sendPlaylist()
+    {
+        try
+        {
+            response.writeObject(ServerApplication.musicLibrary.getPlayList());
+        } catch(IOException e)
+        {
+            System.out.println("Playlist cannot be send!!");
+        }
+    }
 
 }

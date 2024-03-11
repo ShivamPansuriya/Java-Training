@@ -12,6 +12,8 @@ public class MusicLibrary
 
     private Map<String, File> audioFileMapper;
 
+    private Map<String, List<String>> playlistMapper;
+
     MusicLibrary()
     {
 
@@ -20,6 +22,8 @@ public class MusicLibrary
         this.audioFilename = new ArrayList<>();
 
         this.audioFileMapper = new HashMap<>();
+
+        this.playlistMapper = new HashMap<>();
     }
 
     public void loadAudioFile()
@@ -33,6 +37,16 @@ public class MusicLibrary
             audioFilename.add(audioName.getName());
             audioFileMapper.put(audioName.getName(), audioName);
         }
+    }
+
+    public void createPlaylist(String playlistName)
+    {
+        List<String> musicInPlaylist = new ArrayList<>();
+        playlistMapper.put(playlistName,musicInPlaylist);
+    }
+
+    public Map<String, List<String>> getPlayList(){
+        return playlistMapper;
     }
 
     public List<File> getAudioFile()

@@ -2,11 +2,15 @@ package org.example.Client;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ClientRequestHandler
 {
     private final PrintWriter request;
+
+    private final Socket clientSocket;
 
     private final ObjectInputStream response;
 
@@ -16,7 +20,11 @@ public class ClientRequestHandler
 
     ClientRequestHandler(Socket clientSocket)
     {
+        this.clientSocket =clientSocket;
+
         audioPlayer = new AudioPlayer(clientSocket);
+
+        audioFiles = new ArrayList<>();
         try
         {
             this.request = new PrintWriter(clientSocket.getOutputStream() , true);
@@ -31,53 +39,60 @@ public class ClientRequestHandler
 
     }
 
-    public void requestLibrary(){
+    public List<String> requestLibrary(){
         request.println("library");
-
         try
         {
             audioFiles = (List<String>) response.readObject();
-            for(var audioName : audioFiles)
-            {
-                System.out.println(audioName);
-            }
+
+        } catch (EOFException e) {
+            // Handle EOFException gracefully, perhaps by logging an error message
+            System.err.println("Unexpected end of stream while reading audio files");
+
+        }
+        catch(IOException | ClassNotFoundException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        return audioFiles;
+    }
+
+    public void requestAudio(String audioName, TerminalUI terminalUI)
+    {
+            request.println("audioFile");
+
+            request.println(audioName);
+
+        audioPlayer.receiveAndPlayAudio(terminalUI , audioName);
+
+        System.out.println("audio complete");
+
+    }
+
+    public void createPlaylist(String playlistName){
+        request.println("createPlaylist");
+
+        request.println(playlistName);
+    }
+
+    public Map<String,List<String>> requestPlaylist(){
+        request.println("getPlaylist");
+        Map<String, List<String>> availablePlaylist;
+        try
+        {
+            availablePlaylist = (Map<String, List<String>>)response.readObject();
         } catch(IOException | ClassNotFoundException e)
         {
             throw new RuntimeException(e);
         }
-
+        return availablePlaylist;
     }
-
-    public boolean requestAudio(String audioName)
-    {
-        audioName = audioName+".wav";
-        if(audioFiles.contains(audioName))
-        {
-            request.println("audioFile");
-
-            request.println(audioName);
-        }
-        else
-        {
-            return false;
-        }
-
-        audioPlayer.receiveAndPlay();
-        return true;
-
-    }
-
     public void closeConnection(){
 
         // because closing the connection needs time and without it server application reader thread was showing exception(never stops programing)
         request.println("exit");
-        try
-        {
-            Thread.sleep(2000);
-        } catch(InterruptedException e)
-        {
-            throw new RuntimeException(e);
-        }
+
     }
 
 }

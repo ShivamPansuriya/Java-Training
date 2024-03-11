@@ -2,10 +2,7 @@ package org.example.Server;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class AudioStreamer
 {
@@ -24,9 +21,10 @@ public class AudioStreamer
         File requested_file = audioFiles.get(audioName);
 
 //        File FILE_TO_SEND = new File(requested_file);
-        try(BufferedInputStream bis =new BufferedInputStream(new FileInputStream(requested_file));
-            OutputStream os = clientSocket.getOutputStream();)
+        try
         {
+            BufferedInputStream bis =new BufferedInputStream(new FileInputStream(requested_file));
+            OutputStream os = clientSocket.getOutputStream();
             byte[] buffer = new byte[BUFFER_SIZE];
 
             int bytesRead;
