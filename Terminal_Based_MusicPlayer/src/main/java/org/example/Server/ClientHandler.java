@@ -18,14 +18,17 @@ public class ClientHandler extends Thread
     @Override
     public void run()
     {
+        // main class from where all request will be redirected
         ServerRequestHandler serverRequestHandler = new ServerRequestHandler(clientSocket);
+
         try(BufferedReader receive = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));)
         {
             while(true)
             {
+                //request type from client
                 String request = receive.readLine();
 
-                if(request.equals("exit"))
+                if(request==null || request.equals("exit"))
                     break;
 
                 switch(request)
@@ -35,23 +38,61 @@ public class ClientHandler extends Thread
                         break;
 
                     case "audioFile":
+                        //audio file name input from client
                         request = receive.readLine();
+
                         serverRequestHandler.sendAudioFile(request);
+
                         break;
 
                     case "createPlaylist":
+                        //playlist name input from client
                         request = receive.readLine();
+
                         serverRequestHandler.createPlaylist(request);
+
+                        break;
+
+                    case "getPlaylistName":
+                        serverRequestHandler.sendPlaylistName();
+
+                        break;
+
+                    case "addToPlaylist":
+                        //audio file name input from client
+                        request = receive.readLine();
+
+                        serverRequestHandler.addToPlaylist(request);
+
                         break;
 
                     case "getPlaylist":
-                        serverRequestHandler.sendPlaylist();
+                        //playlist name input from client
+                        request = receive.readLine();
+
+                        serverRequestHandler.sendPlaylist(request);
+
                         break;
                 }
             }
         } catch(IOException e)
         {
-            throw new RuntimeException(e);
+            System.out.println("An IOException occurred. Please check your input or connection." + e.getMessage());
+        }
+        catch(NullPointerException e){
+            System.out.println("(ERROR) entered request is null: ");
+        }
+        finally
+        {
+            try
+            {
+                clientSocket.close();
+
+                System.out.println("client connection closed: " + clientSocket);
+            } catch(IOException e)
+            {
+                System.out.println("(ERROR) client socket is closed");
+            }
         }
     }
 }

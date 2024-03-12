@@ -12,8 +12,10 @@ public class ServerSockets
 
     private final ExecutorService executorService;
 
-    ServerSockets(int port){
+    ServerSockets(int port)
+    {
         this.port = port;
+
         this.executorService = Executors.newCachedThreadPool();
     }
 
@@ -32,7 +34,7 @@ public class ServerSockets
             }
         } catch(IOException e)
         {
-            throw new RuntimeException(e);
+            System.out.println("(ERROR) Socket is already in use cannot create same socket: " + e.getMessage());
         }
     }
 

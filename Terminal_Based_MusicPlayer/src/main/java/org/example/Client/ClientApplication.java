@@ -9,6 +9,5 @@ public class ClientApplication
 
         ClientSocket clientSocket = new ClientSocket(serverIP,port);
         clientSocket.connect();
-
     }
 }

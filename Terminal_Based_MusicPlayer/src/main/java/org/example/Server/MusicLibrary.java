@@ -8,18 +8,18 @@ public class MusicLibrary
 {
     private List<File> audioFile;
 
-    private List<String> audioFilename;
+    private Set<String> audioFilename;
 
     private Map<String, File> audioFileMapper;
 
-    private Map<String, List<String>> playlistMapper;
+    private Map<String, Set<String>> playlistMapper;
 
     MusicLibrary()
     {
 
         this.audioFile = new ArrayList<>();
 
-        this.audioFilename = new ArrayList<>();
+        this.audioFilename = new HashSet<>();
 
         this.audioFileMapper = new HashMap<>();
 
@@ -41,23 +41,28 @@ public class MusicLibrary
 
     public void createPlaylist(String playlistName)
     {
-        List<String> musicInPlaylist = new ArrayList<>();
+        Set<String> musicInPlaylist = new HashSet<>();
         playlistMapper.put(playlistName,musicInPlaylist);
+        System.out.println(playlistName);
     }
 
-    public Map<String, List<String>> getPlayList(){
-        return playlistMapper;
-    }
-
-    public List<File> getAudioFile()
-
+    public List<String> getPlayListName()
     {
-        return audioFile;
+        return playlistMapper.keySet().stream().toList();
+    }
+
+    public List<String> getPlaylist(String playlistName){
+        return playlistMapper.get(playlistName).stream().toList();
+    }
+
+    public void addToPlaylist(String playlistName, String audioName){
+        playlistMapper.get(playlistName).add(audioName);
     }
 
     public List<String> getAudioFilename()
     {
-        return audioFilename;
+        loadAudioFile();
+        return audioFilename.stream().toList();
     }
 
     public Map<String,File> getAudioFileMapper()

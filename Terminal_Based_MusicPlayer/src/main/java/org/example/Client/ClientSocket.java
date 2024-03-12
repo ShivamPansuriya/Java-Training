@@ -29,12 +29,18 @@ public class ClientSocket
 
             terminalUI.start();
 
-//            try(BufferedReader receive = new BufferedReader(new InputStreamReader(socket.getInputStream()));){
-//                System.out.println(receive.readLine());
-//            }
         } catch(IOException e)
         {
-            throw new RuntimeException(e);
+            System.out.println("Socket you are trying to connect is not available");
+
+            try
+            {
+                Thread.sleep(5000);
+            } catch(InterruptedException ex)
+            {
+                System.out.println("(FATAL ERROR)");
+            }
+            ClientApplication.main(null);
         }
     }
 
@@ -42,7 +48,7 @@ public class ClientSocket
         try {
             socket.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Cannot disconnect socket connection");
         }
     }
 }

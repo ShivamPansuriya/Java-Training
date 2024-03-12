@@ -3,6 +3,7 @@ package org.example.Server;
 import java.io.*;
 import java.net.Socket;
 import java.util.List;
+import java.util.Map;
 
 public class ServerRequestHandler
 {
@@ -23,7 +24,7 @@ public class ServerRequestHandler
             this.response = new ObjectOutputStream(clientSocket.getOutputStream());
         } catch(IOException e)
         {
-            throw new RuntimeException(e);
+            System.out.println("(Error) cannot write on outputStream: " + e.getMessage());
         }
 
     }
@@ -37,7 +38,7 @@ public class ServerRequestHandler
             response.writeObject(files);
         } catch(IOException e)
         {
-            throw new RuntimeException(e);
+            System.out.println("(Error) cannot send Library: " + e.getMessage());
         }
     }
 
@@ -50,15 +51,31 @@ public class ServerRequestHandler
         ServerApplication.musicLibrary.createPlaylist(playlistName);
     }
 
-    public void sendPlaylist()
+    public void sendPlaylistName()
     {
         try
         {
-            response.writeObject(ServerApplication.musicLibrary.getPlayList());
+            response.writeObject(ServerApplication.musicLibrary.getPlayListName());
         } catch(IOException e)
         {
-            System.out.println("Playlist cannot be send!!");
+            System.out.println("(Error) cannot send Playlist: " + e.getMessage());
         }
+    }
+
+    public void sendPlaylist(String playlistName)
+    {
+        try
+        {
+            response.writeObject(ServerApplication.musicLibrary.getPlaylist(playlistName));
+        } catch(IOException e)
+        {
+            System.out.println("(Error) cannot send Playlist: " + e.getMessage());
+        }
+    }
+
+    public void addToPlaylist(String audioName){
+        String[] inputIdentifier = audioName.split(" ");
+        ServerApplication.musicLibrary.addToPlaylist(inputIdentifier[0], inputIdentifier[1]);
     }
 
 }

@@ -39,7 +39,7 @@ public class AudioStreamer
             System.out.println("Sent " + requested_file + " to client.");
         } catch(IOException e)
         {
-            throw new RuntimeException(e);
+            System.out.println("(ERROR) cannot Stream audio: " + e.getMessage());
         }
 
     }

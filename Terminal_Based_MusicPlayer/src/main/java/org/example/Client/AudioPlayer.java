@@ -18,41 +18,7 @@ public class AudioPlayer
         this.clientSocket = clientSocket;
     }
 
-    public void receiveAndPlay(){
-        try
-        {
-            // Wrap the input stream with a BufferedInputStream to support mark/reset
-            InputStream bufferedIn = new BufferedInputStream(clientSocket.getInputStream());
-
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(bufferedIn);
-
-            AudioFormat format = audioInputStream.getFormat();
-
-            DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
-
-            SourceDataLine auline = (SourceDataLine) AudioSystem.getLine(info);
-
-            auline.open(format);
-
-            auline.start();
-
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-
-            while((bytesRead = audioInputStream.read(buffer)) != -1)
-            {
-                auline.write(buffer, 0, bytesRead);
-            }
-
-            auline.drain();
-            auline.close();
-        } catch(UnsupportedAudioFileException | IOException | LineUnavailableException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void receiveAndPlayAudio(TerminalUI terminalUI, String audioName) {
+    public void receiveAndPlayAudio(TerminalUI terminalUI, String audioName, String playedFrom) {
         try
         {
             InputStream is = clientSocket.getInputStream();
@@ -66,12 +32,17 @@ public class AudioPlayer
             clip.open(audioInputStream);
 
 
-            terminalUI.AudioPlayerUI(clip, audioName);
+            terminalUI.AudioPlayerUI(clip, audioName, playedFrom);
 
-
-        } catch(UnsupportedAudioFileException | IOException | LineUnavailableException e)
+        } catch(UnsupportedAudioFileException e)
         {
-            throw new RuntimeException(e);
+            System.out.println("(ERROR) audio file is not supported: " + e.getMessage());
+        } catch(LineUnavailableException e)
+        {
+            System.out.println("(ERROR) audio file is corrupted: " + e.getMessage());
+        } catch(IOException e)
+        {
+            System.out.println("(ERROR) cannot read audio file from server: " + e.getMessage());
         }
     }
 

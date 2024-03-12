@@ -1,23 +1,19 @@
 package org.example.Client;
 
 import javax.sound.sampled.Clip;
-import java.security.PublicKey;
 import java.util.Scanner;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class TerminalUI
 {
     private final ClientSocket clientSocket;
 
-    private  PlaybackManager playbackManager;
+    private static  PlaybackManager playbackManager;
 
     private ClientRequestHandler clientRequestHandler;
 
-    private final String newLine = "\n";
+    private final String NEWLINE = "\n";
 
-    private final String tab = "\t";
+    private final String TAB = "\t";
 
     private final Scanner input;
 
@@ -26,6 +22,8 @@ public class TerminalUI
         this.clientSocket = clientSocket;
 
         this.clientRequestHandler = clientRequestHandler;
+
+        clientRequestHandler.setTerminalUI(this);
 
         this.input = new Scanner(System.in);
 
@@ -36,9 +34,10 @@ public class TerminalUI
     {
         while(true)
         {
-            String commandOption = "Entre Command:" + newLine +"1) Playlist"  + newLine +"2) Library" + newLine +"3) Exit from application";
+            menu("MENU");
+            String commandOption = "1) Playlist"  + NEWLINE +"2) Library" + NEWLINE +"3) Exit from application" +NEWLINE+ "Enter Command:";
 
-            System.out.println(commandOption);
+            System.out.print(commandOption);
 
             String command = input.nextLine();
 
@@ -52,7 +51,7 @@ public class TerminalUI
                     break;
 
                 case "2":
-                    System.out.println("Library");
+                    System.out.println();
 
                     library();
 
@@ -68,104 +67,157 @@ public class TerminalUI
                     return;
 
                 default:
-                    System.out.println("entre correct option");
+                    System.out.println("Enter correct option");
 
                     break;
             }
         }
     }
 
+    public void menu(String heading){
+        System.out.println("-------------------------------");
+        System.out.println(TAB + TAB +TAB +heading);
+        System.out.println("-------------------------------");
+    }
+
     public void playlist()
     {
-        System.out.println("Entre Command: 1) EXIT playlist"+ tab + "2) CREATE playlist" + tab + "3) WATCH playlist");
 
         var playlist = clientRequestHandler.requestPlaylist();
 
-        if(playlist.isEmpty())
-        {
-            System.out.println("No Playlist available");
-        }
-        else
-        {
-            for(var playlistName : playlist.keySet())
-            {
-                System.out.println(playlistName);
-            }
-        }
+        menu("PLAYLIST");
+
+        System.out.println("1) Exit playlist"+ TAB +"2) Show playlists"+ TAB + "3) Create playlist" + TAB + "4) Listen playlist");
+
+        System.out.print("Enter Command: ");
+
         String command = input.nextLine();
 
         switch(command)
         {
             case "1":
-                start();
+                return;
 
             case "2":
-                System.out.print("Entre Playlist name: ");
+                if(playlist.isEmpty())
+                {
+                    System.out.println(NEWLINE + "No Playlist available");
+                }
+                else
+                {
+                    System.out.println(NEWLINE + "Available playlist are:");
+
+                    for(var playlistName : playlist)
+                    {
+                        System.out.println(playlistName);
+                    }
+                }
+                break;
+
+            case "3":
+                System.out.print("Enter Playlist name: ");
 
                 String playlistName = input.nextLine();
 
+                //validate if playlist is already available or not
+                while(playlist.contains(playlistName)){
+                    System.out.print("Playlist already available please entre another name to create playlist: ");
+
+                    playlistName = input.nextLine();
+                }
+
                 clientRequestHandler.createPlaylist(playlistName);
 
-            case "3":
-                System.out.print("Entre the music name: ");
+                break;
+
+            case "4":
+                System.out.print("Enter the Playlist name you want to play: ");
+
+                playlistName = input.nextLine();
+
+                //validate if playlist is available or not
+                while(!playlist.contains(playlistName))
+                {
+
+                    System.out.print("Playlist not found please enter correct name or 1 to exit: ");
+
+                    playlistName = input.nextLine();
+                    if(playlistName.equals("1")){
+                        playlist();
+                    }
+                }
+
+                // start playing playlist
+                clientRequestHandler.playPlaylist(playlistName);
+
+                break;
+
+            default:
+                System.out.println("please Enter valid command!!!!");
+
+                break;
         }
 
+        playlist();
 
     }
     public void library()
     {
-        System.out.println("Entre Command: 1) EXIT library");
-
+        // list all files that are available in library;
         var audioFiles = clientRequestHandler.requestLibrary();
 
-        for(var audioFile : audioFiles){
+        for(var audioFile : audioFiles)
+        {
             System.out.println(audioFile);
         }
-        System.out.println();
-        System.out.print("Entre the music name: ");
+
+        menu("LIBRARY");
+
+        System.out.println("1) EXIT library");
+
+        System.out.print("Enter the music name or 1 to exit: ");
 
         String audioName = input.nextLine();
 
+        // exit from library
         if(!audioName.equals("1"))
         {
+            // validate audio name
             while(!audioFiles.contains(audioName+".wav"))
             {
-                System.out.print("Please entre valid audio file name: ");
+                System.out.print("Please Enter valid audio file name: ");
 
                 audioName = input.nextLine();
             }
 
-            clientRequestHandler.requestAudio(audioName+".wav", this);
+            //request audio file from server
+            clientRequestHandler.requestAudio(audioName+".wav" , "library");
 
             library();
         }
     }
 
-    public void AudioPlayerUI(Clip clip, String audioName)
+    public void AudioPlayerUI(Clip clip, String audioName, String playedFrom)
     {
+        // to enable playbackManager to handle audio file
         playbackManager.setClip(clip);
+
+        // set the name of current playing audio
         playbackManager.setAudio(audioName);
+
         System.out.println("Playing audio: " + playbackManager.getAudio());
+
+        //display audio length in seconds
+        System.out.println(clip.getMicrosecondLength()/1000000);
+
         Scanner sc = new Scanner(System.in);
+
         clip.start();
-
-        // Start playing the audio
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
-        // Define the task to be executed
-        Runnable task = ()-> playbackManager.closeAudio();
-
-        // Schedule the task to run after a delay of audiolength seconds
-        System.out.println(clip.getFrameLength());
-        executorService.schedule(task, clip.getMicrosecondLength(), TimeUnit.MICROSECONDS);
-
-        // Shutdown the executor service after the task has been scheduled
-        executorService.shutdown();
 
         while(true)
         {
-            System.out.println();
-            System.out.println("Entre command: 1) Play music" + tab + "2) Pause music" + tab + "3) Set volume"+ tab + "4) Previous music "+ tab + "5) Close music");
+            System.out.println(NEWLINE + "Enter command: 1) Play music" + TAB + "2) Pause music" + TAB + "3) Set volume"+ TAB + "4) Previous music "+ TAB + "5) Next music"+ TAB +"6) Add to playlist" + TAB + "7)close music" );
+
             String command = sc.nextLine();
 
             switch(command)
@@ -183,10 +235,29 @@ public class TerminalUI
                     break;
 
                 case "4":
-                    clientRequestHandler.requestAudio(playbackManager.getPreviousAudio(),this);
+                    clientRequestHandler.requestAudio(playbackManager.getPreviousAudio(),playedFrom);
                     return;
 
                 case "5":
+                    playbackManager.closeAudio();
+                    clientRequestHandler.requestNextAudio(playbackManager.getAudio(), playedFrom);
+                    return;
+
+                case "6":
+                    System.out.print("Enter playlist name: ");
+
+                    command = input.nextLine();
+
+                    //check if the given input is valid playlist name
+                    while(!clientRequestHandler.requestAddToPlaylist(command,playbackManager.getAudio()))
+                    {
+                        System.out.print("enter correct playlist name: ");
+
+                        command = input.nextLine();
+                    }
+                    break;
+
+                case "7":
                     playbackManager.closeAudio();
                     return;
 

@@ -16,6 +16,7 @@ public class PlaybackManager
     public void setClip(Clip clip){
         this.clip = clip;
     }
+
     public void playAudio()
     {
         if(clip != null && !clip.isRunning())
@@ -50,7 +51,7 @@ public class PlaybackManager
     public void setVolume() {
         Scanner sc = new Scanner(System.in);
 
-        System.out.println("Entre the volume level(0 to 1): ");
+        System.out.println("Enter the volume level(0 to 1): ");
 
         float volume = sc.nextFloat();
 
@@ -78,6 +79,8 @@ public class PlaybackManager
     {
         closeAudio();
 
+        System.out.println(musicQueue);
+
         String lastAudio = musicQueue.pop();
 
         if(musicQueue.isEmpty())
@@ -86,7 +89,7 @@ public class PlaybackManager
         }
         else
         {
-            return musicQueue.peek();
+            return musicQueue.pop();
         }
     }
 
