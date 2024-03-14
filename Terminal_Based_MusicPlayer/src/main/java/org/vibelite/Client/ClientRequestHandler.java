@@ -1,4 +1,4 @@
-package org.vibelite.Client.handler;
+package org.vibelite.Client;
 
 import org.vibelite.Client.ui.TerminalUI;
 
@@ -13,6 +13,8 @@ public class ClientRequestHandler
 {
     private PrintWriter request;
 
+    private final Socket clientSocket;
+
     private TerminalUI terminalUI;
 
     private ObjectInputStream response;
@@ -24,11 +26,13 @@ public class ClientRequestHandler
 
     private List<String> availablePlaylist;
 
-    private AudioStreamer audioStreamer;
+    private AudioPlayer audioPlayer;
 
-    public ClientRequestHandler(Socket clientSocket)
+    ClientRequestHandler(Socket clientSocket)
     {
-        audioStreamer = new AudioStreamer(clientSocket);
+        this.clientSocket =clientSocket;
+
+        audioPlayer = new AudioPlayer(clientSocket);
 
         audioFiles = new ArrayList<>();
 
@@ -73,7 +77,6 @@ public class ClientRequestHandler
     }
 
     public void requestNextAudio(String currentAudio, String playedFrom){
-
         int size,currentIndex, nextIndex;
 
         if(playedFrom.equals("playlist")){
@@ -86,27 +89,20 @@ public class ClientRequestHandler
             //determining next audio index
             nextIndex = (currentIndex < size-1)? ++currentIndex : 0;
 
-            //finding next audio name
             String audioName = playlist.get(nextIndex);
 
-            //request server for audio file
             requestAudio(audioName, playedFrom);
         }
         else
         {
-            //get size of library
             size= audioFiles.size();
 
-            //finding index of current playing audio
             currentIndex = audioFiles.indexOf(currentAudio);
 
-            //determining next audio index
             nextIndex = (currentIndex < size-1)? ++currentIndex : 0;
 
-            //finding next audio name
             String audioName = audioFiles.get(nextIndex);
 
-            //request server for audio file
             requestAudio(audioName, playedFrom);
         }
     }
@@ -119,37 +115,24 @@ public class ClientRequestHandler
         //sending actual request
         request.println(audioName);
 
-        audioStreamer.receiveAndPlayAudio(terminalUI , audioName, playedFrom);
+        audioPlayer.receiveAndPlayAudio(terminalUI , audioName, playedFrom);
 
     }
 
     public void uploadAudio(){
         System.out.println("Enter audio file path: ");
-
         Scanner INPUT = new Scanner(System.in);
 
         var filePath = INPUT.next();
 
-        //splitting file path in directories to get filename
         var directories = filePath.trim().split("/");
 
-        //extracting file name from file path array
         var fileName = directories[directories.length -1];
 
-        //request library to check if audio you are trying is upload is already present or not
-        requestLibrary();
-
-        if(audioFiles.contains(fileName)){
-            System.out.println("File already exists");
-            return;
-        }
-
-        // checking if file actually exists or not and whether it is executable
         if(Files.exists(Paths.get(filePath)) && fileName.contains("."))
         {
             try
             {
-                //MIME type output for .wav file  = audio/wav
                 var fileType = Files.probeContentType(Path.of(filePath)).split("/",2);
 
                 if(!(fileType[0].equals("audio") && fileType[1].contains("wav")))
@@ -167,41 +150,11 @@ public class ClientRequestHandler
             return;
         }
 
-        //sending request type
         request.println("uploadAudio");
 
-        //sending audio file in json string
-        request.println(audioStreamer.sendAudio(filePath, fileName).toString());
+        request.println(fileName);
 
-        System.out.println("success");
-
-    }
-
-    public void downloadAudio(String audioName){
-        //sending request type
-        request.println("downloadAudio");
-
-        //sending audio name to server that user wants to download
-        request.println(audioName);
-
-        //receive json object
-        try
-        {
-            //receiving json object of audio file
-            String audioJSON = (String) response.readObject();
-
-            //converting json object to audio file
-            audioStreamer.downloadAudio(audioJSON);
-        } catch(IOException e)
-        {
-            System.out.println("Server down");
-
-            System.out.println("Retrying to establish connection");
-        } catch(ClassNotFoundException e)
-        {
-            System.out.println("(ERROR) cannot assign object to string type:");
-        }
-
+        audioPlayer.sendAudio((filePath));
     }
 
     public void createPlaylist(String playlistName)
@@ -275,7 +228,7 @@ public class ClientRequestHandler
             //response from server
             playlist = (List<String>) response.readObject();
 
-            if(playlist.isEmpty())
+            if(playlist.size()==0)
             {
                 System.out.println("Playlist is Empty");
             }

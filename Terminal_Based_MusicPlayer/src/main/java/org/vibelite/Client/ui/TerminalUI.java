@@ -6,6 +6,7 @@ import org.vibelite.Client.handler.PlaybackManager;
 import static org.vibelite.Client.utils.Constants.*;
 
 import javax.sound.sampled.Clip;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class TerminalUI
@@ -16,8 +17,6 @@ public class TerminalUI
 
     private final ClientRequestHandler clientRequestHandler;
 
-//    private final Scanner input;
-
     public TerminalUI(ClientSocket clientSocket, ClientRequestHandler clientRequestHandler)
     {
         this.clientSocket = clientSocket;
@@ -26,27 +25,25 @@ public class TerminalUI
 
         clientRequestHandler.setTerminalUI(this);
 
-//        this.input = new Scanner(System.in);
-
         playbackManager = new PlaybackManager();
     }
 
     public void start()
     {
-        PlaylistUI playlistUI = new PlaylistUI(clientRequestHandler);
+        var playlistUI = new PlaylistUI(clientRequestHandler);
 
-        LibraryUI libraryUI = new LibraryUI(clientRequestHandler);
+        var libraryUI = new LibraryUI(clientRequestHandler);
         while(true)
         {
             System.out.println("-------------------------------");
             System.out.println(TAB + TAB +TAB +"Menu");
             System.out.println("-------------------------------");
 
-            String commandOption = "1) Playlist"  + NEWLINE +"2) Library" + NEWLINE + "0) Exit from application" +NEWLINE+ "Enter Command:";
+            var commandOption = "1) Playlist"  + NEWLINE +"2) Library" + NEWLINE +"3) Upload music" + NEWLINE + "0) Exit from application" +NEWLINE+ "Enter Command:";
 
             System.out.print(commandOption);
 
-            String command = INPUT.nextLine();
+            var command = INPUT.nextLine();
 
             switch(command)
             {
@@ -63,7 +60,11 @@ public class TerminalUI
                     libraryUI.library();
 
                     break;
-                    
+
+                case "3":
+                    clientRequestHandler.uploadAudio();
+                    break;
+
                 case "0":
                     System.out.println("Exiting....");
 
@@ -92,17 +93,17 @@ public class TerminalUI
         System.out.println("Playing audio: " + playbackManager.getAudio());
 
         //display audio length in seconds
-        System.out.println(clip.getMicrosecondLength()/1000000);
+        System.out.println("Audio length: " + clip.getMicrosecondLength()/1000000 + "sec");
 
-        Scanner sc = new Scanner(System.in);
+        var sc = new Scanner(System.in);
 
         clip.start();
 
         while(true)
         {
-            System.out.println(NEWLINE + "Enter command: 1) Play music" + TAB + "2) Pause music" + TAB + "3) Set volume"+ TAB + "4) Previous music "+ TAB + "5) Next music"+ TAB +"6) Add to playlist" + TAB + "7)reset music" + TAB + "0) Close music" );
+            System.out.println(NEWLINE + "Enter command: 1) Play music" + TAB + "2) Pause music" + TAB + "3) Set volume"+ TAB + "4) Previous music "+ TAB + "5) Next music"+ TAB +"6) Add to playlist" + TAB + "7)reset music" + TAB + "8) Download music" + TAB + "0) Close music" );
 
-            String command = sc.nextLine();
+            var command = sc.nextLine();
 
             switch(command)
             {
@@ -152,6 +153,13 @@ public class TerminalUI
 
                 case "7":
                     playbackManager.resetAudio();
+
+                    break;
+
+                case "8":
+                    clientRequestHandler.downloadAudio(playbackManager.getAudio());
+
+                    System.out.println("Download Successful");
 
                     break;
 

@@ -1,4 +1,4 @@
-package org.vibelite.Server.handler;
+package org.vibelite.Server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,7 +9,7 @@ public class ClientHandler extends Thread
 {
     private final Socket clientSocket;
 
-    public ClientHandler(Socket socket)
+    ClientHandler(Socket socket)
     {
 
         this.clientSocket = socket;
@@ -19,14 +19,14 @@ public class ClientHandler extends Thread
     public void run()
     {
         // main class from where all request will be redirected
-        var serverRequestHandler = new ServerRequestHandler(clientSocket);
+        ServerRequestHandler serverRequestHandler = new ServerRequestHandler(clientSocket);
 
         try(BufferedReader receive = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));)
         {
             while(true)
             {
                 //request type from client
-                var request = receive.readLine();
+                String request = receive.readLine();
 
                 if(request==null || request.equals("exit"))
                     break;
@@ -41,7 +41,7 @@ public class ClientHandler extends Thread
                         //audio file name input from client
                         request = receive.readLine();
 
-                        serverRequestHandler.streamAudioFile(request);
+                        serverRequestHandler.sendAudioFile(request);
 
                         break;
 
@@ -80,11 +80,6 @@ public class ClientHandler extends Thread
                         serverRequestHandler.saveAudio(request);
 
                         break;
-
-                    case "downloadAudio":
-                        request = receive.readLine();
-
-                        serverRequestHandler.sendAudioFile(request);
                 }
             }
         } catch(IOException e)

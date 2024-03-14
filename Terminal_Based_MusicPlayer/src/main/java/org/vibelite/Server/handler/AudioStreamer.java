@@ -1,5 +1,6 @@
 package org.vibelite.Server.handler;
 
+import org.json.JSONObject;
 import org.vibelite.Server.ServerApplication;
 
 import java.io.*;
@@ -18,17 +19,18 @@ public class AudioStreamer
         this.clientSocket = clientSocket;
     }
 
-    public void sendAudioToClient(String audioName)
+    public void streamAudioToClient(String audioName)
     {
-        Map<String, File> audioFiles = ServerApplication.musicLibrary.getAudioFileMapper();
+        var audioFiles = ServerApplication.musicLibrary.getAudioFileMapper();
 
-        File requested_file = audioFiles.get(audioName);
+        var requested_file = audioFiles.get(audioName);
 
-        //        File FILE_TO_SEND = new File(requested_file);
         try
         {
-            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(requested_file));
-            OutputStream os = clientSocket.getOutputStream();
+            var bis = new BufferedInputStream(new FileInputStream(requested_file));
+
+            var os = clientSocket.getOutputStream();
+
             byte[] buffer = new byte[BUFFER_SIZE];
 
             int bytesRead;
@@ -47,27 +49,61 @@ public class AudioStreamer
         }
 
     }
-    public void saveAudioFromClient(String audioName)
+    public void saveAudioFromClient(String audioJSON)
     {
         try
         {
-            String outputFilePath = "./src/main/resources/Audio/"+audioName;
-            InputStream inputStream = clientSocket.getInputStream();
-            // Write the received data to a file
-            FileOutputStream fileOutputStream = new FileOutputStream(outputFilePath);
-            byte[] buffer = new byte[8192];
-            int bytesRead;
+            var audioJson = new JSONObject(audioJSON);
 
-            while((bytesRead = inputStream.read(buffer)) != -1)
-            {
-                fileOutputStream.write(buffer, 0, bytesRead);
-            }
-            fileOutputStream.close();
+            // Decode Base64 audio data - gives array of byte
+            var audioData = java.util.Base64.getDecoder().decode(audioJson.getString("content"));
 
-            System.out.println("File received and saved to " + outputFilePath);
+            // Write audio data to a file
+            FileOutputStream fos = new FileOutputStream("./src/main/resources/Audio/"+audioJson.getString("filename"));
+
+            fos.write(audioData);
+
+            fos.close();
         } catch(IOException e)
         {
             System.out.println("(ERROR) cannot download file or data lost");
         }
+    }
+
+    public JSONObject sendAudioToClient(String audioName)
+    {
+        var audioFiles = ServerApplication.musicLibrary.getAudioFileMapper();
+        try
+        {
+            File file = audioFiles.get(audioName);
+
+            var fileData = new byte[(int) file.length()];
+
+            var  fileInputStream = new FileInputStream(file);
+
+            fileInputStream.read(fileData);
+
+            // Encode audio data as Base64
+            String encodedAudio = java.util.Base64.getEncoder().encodeToString(fileData);
+
+            // Prepare JSON object
+            var audioJson = new JSONObject();
+
+            audioJson.put("filename", audioName);
+
+            audioJson.put("content", encodedAudio);
+
+
+
+            fileInputStream.close();
+
+            // Send JSON data
+            return audioJson;
+
+        } catch(IOException e)
+        {
+            System.out.println("(ERROR) Cannot read File it may be corrupted");
+        }
+        return null;
     }
 }

@@ -6,10 +6,10 @@ public class ClientApplication
 {
     public static void main(String[] args)
     {
-        int port = 6000;
-        String serverIP = "localhost";
+        var port = 6000;
+        var serverIP = "localhost";
 
-        ClientSocket clientSocket = new ClientSocket(serverIP,port);
+        var clientSocket = new ClientSocket(serverIP,port);
         clientSocket.connect();
     }
 }

@@ -1,4 +1,4 @@
-package org.vibelite.Server.connection;
+package org.vibelite.Server;
 
 import org.vibelite.Server.handler.ClientHandler;
 
@@ -14,7 +14,7 @@ public class ServerSockets
 
     private final ExecutorService executorService;
 
-    public ServerSockets(int port)
+    ServerSockets(int port)
     {
         this.port = port;
 
@@ -28,9 +28,9 @@ public class ServerSockets
 
             while(true)
             {
-                var clientSocket = serverSocket.accept();
+                Socket clientSocket = serverSocket.accept();
 
-                var clientHandler = new ClientHandler(clientSocket);
+                ClientHandler clientHandler = new ClientHandler(clientSocket);
 
                 executorService.execute(clientHandler);
             }

@@ -1,11 +1,11 @@
-package org.vibelite.Client.handler;
+package org.vibelite.Client;
 
 import org.vibelite.Client.ui.TerminalUI;
 
 import javax.sound.sampled.*;
 import java.io.*;
 import java.net.Socket;
-import java.nio.ByteBuffer;
+import java.nio.file.Path;
 
 public class AudioPlayer
 {
@@ -46,9 +46,42 @@ public class AudioPlayer
         }
     }
 
-
     public void sendAudio(String filePath)
     {
+        try
+        {
+            var file = new File(filePath);
+
+            var dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
+
+            FileInputStream fileInputStream = new FileInputStream(file);
+
+            // Here we send the File to Server
+            dataOutputStream.writeLong(file.length());
+
+            // Send the file to the client
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+
+            while((bytesRead = fileInputStream.read(buffer)) != -1)
+            {
+                // Send the file to Server Socket
+                dataOutputStream.write(buffer, 0, bytesRead);
+
+                dataOutputStream.flush();
+            }
+
+            // close the file here
+            fileInputStream.close();
+
+
+
+            System.out.println("File sent to server.");
+
+        } catch(IOException e)
+        {
+            System.out.println("(ERROR) cannot upload file to server");
+        }
     }
 
 

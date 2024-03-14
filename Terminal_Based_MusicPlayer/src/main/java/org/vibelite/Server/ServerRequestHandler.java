@@ -1,12 +1,12 @@
-package org.vibelite.Server.handler;
-
-import org.vibelite.Server.ServerApplication;
+package org.vibelite.Server;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.List;
 
 public class ServerRequestHandler
 {
+    private final Socket clientSocket;
 
     private ObjectOutputStream response;
 
@@ -14,11 +14,13 @@ public class ServerRequestHandler
 
     ServerRequestHandler(Socket socket)
     {
-        audioStreamer = new AudioStreamer(socket);
+        this.clientSocket = socket;
+
+        audioStreamer = new AudioStreamer(clientSocket);
 
         try
         {
-            this.response = new ObjectOutputStream(socket.getOutputStream());
+            this.response = new ObjectOutputStream(clientSocket.getOutputStream());
         } catch(IOException e)
         {
             System.out.println("(Error) cannot write on outputStream: " + e.getMessage());
@@ -28,7 +30,7 @@ public class ServerRequestHandler
 
     public void sendLibrary()
     {
-        var files = ServerApplication.musicLibrary.getAudioFilename();
+        List<String> files = ServerApplication.musicLibrary.getAudioFilename();
 
         try
         {
@@ -39,19 +41,8 @@ public class ServerRequestHandler
         }
     }
 
-    public void streamAudioFile(String audioName){
-        audioStreamer.streamAudioToClient(audioName);
-    }
-
     public void sendAudioFile(String audioName){
-
-        try
-        {
-            response.writeObject(audioStreamer.sendAudioToClient(audioName).toString());
-        } catch(IOException e)
-        {
-            System.out.println("(ERROR) cannot send audio file to client");
-        }
+        audioStreamer.sendAudioToClient(audioName);
     }
 
     public void createPlaylist(String playlistName)
@@ -59,15 +50,15 @@ public class ServerRequestHandler
         ServerApplication.musicLibrary.createPlaylist(playlistName);
     }
 
-    public void saveAudio(String audioJSON)
+    public void saveAudio(String audioName)
     {
-        audioStreamer.saveAudioFromClient(audioJSON);
+        audioStreamer.saveAudioFromClient(audioName);
     }
     public void sendPlaylistName()
     {
         try
         {
-            response.writeObject(ServerApplication.musicLibrary.getPlayListNames());
+            response.writeObject(ServerApplication.musicLibrary.getPlayListName());
         } catch(IOException e)
         {
             System.out.println("(Error) cannot send Playlist: " + e.getMessage());
@@ -78,7 +69,7 @@ public class ServerRequestHandler
     {
         try
         {
-            response.writeObject(ServerApplication.musicLibrary.getPlaylists(playlistName));
+            response.writeObject(ServerApplication.musicLibrary.getPlaylist(playlistName));
         } catch(IOException e)
         {
             System.out.println("(Error) cannot send Playlist: " + e.getMessage());
@@ -86,9 +77,7 @@ public class ServerRequestHandler
     }
 
     public void addToPlaylist(String audioName){
-
-        var inputIdentifier = audioName.split(" ");
-        // playlist name + audio name
+        String[] inputIdentifier = audioName.split(" ");
         ServerApplication.musicLibrary.addToPlaylist(inputIdentifier[0], inputIdentifier[1]);
     }
 

@@ -5,8 +5,9 @@ import java.util.*;
 
 public class MusicLibrary
 {
-    private List<File> audioFile;
+    private List<File> audioFiles;
 
+    // TODO :- remove redundant data structure
     private final Set<String> audioFilename;
 
     private final Map<String, File> audioFileMapper;
@@ -16,7 +17,7 @@ public class MusicLibrary
     public MusicLibrary()
     {
 
-        this.audioFile = new ArrayList<>();
+        this.audioFiles = new ArrayList<>();
 
         this.audioFilename = new HashSet<>();
 
@@ -28,40 +29,45 @@ public class MusicLibrary
     public void loadAudioFile()
     {
         //making arraylist(will store relative FILE path) of audio file that has .mp3 and .wav files
-        File audioDirectory = new File("./src/main/resources/Audio");
+        // TODO - make constant for current_directory and path separator
+        var audioDirectory = new File("./src/main/resources/Audio");
 
-        audioFile = Arrays.stream(audioDirectory.listFiles((dir, name) -> name.endsWith(".mp3") || name.endsWith(".wav"))).toList();
+        audioFiles = Arrays.stream(audioDirectory.listFiles((dir, name) -> name.endsWith(".mp3") || name.endsWith(".wav"))).toList();
 
-        for(var audioName : audioFile){
-            audioFilename.add(audioName.getName());
-            audioFileMapper.put(audioName.getName(), audioName);
+        for (var file : audioFiles)
+        {
+            audioFilename.add(file.getName());
+
+            audioFileMapper.put(file.getName(), file);
         }
     }
 
     public void createPlaylist(String playlistName)
     {
-        Set<String> musicInPlaylist = new HashSet<>();
-        playlistMapper.put(playlistName,musicInPlaylist);
-        System.out.println(playlistName);
+        playlistMapper.put(playlistName,new HashSet<>());
     }
 
-    public List<String> getPlayListName()
+    public List<String> getPlayListNames()
     {
         return playlistMapper.keySet().stream().toList();
     }
 
-    public List<String> getPlaylist(String playlistName){
+    public List<String> getPlaylists(String playlistName)
+    {
         return playlistMapper.get(playlistName).stream().toList();
     }
 
-    public void addToPlaylist(String playlistName, String audioName){
+    public void addToPlaylist(String playlistName, String audioName)
+    {
         playlistMapper.get(playlistName).add(audioName);
     }
 
     public List<String> getAudioFilename()
     {
         audioFilename.clear();
+
         loadAudioFile();
+
         return audioFilename.stream().toList();
     }
 

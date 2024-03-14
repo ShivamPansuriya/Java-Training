@@ -24,7 +24,6 @@ public class LibraryUI
                 System.out.println(audioFile.substring(0,audioFile.length()-4));
             }
 
-//            Scanner input = new Scanner(System.in);
             System.out.println("-------------------------------");
             System.out.println(TAB + TAB +TAB +"LIBRARY");
             System.out.println("-------------------------------");
@@ -33,7 +32,7 @@ public class LibraryUI
 
             System.out.print("Enter the music name or 0 to exit: ");
 
-            String audioName = INPUT.nextLine();
+            var audioName = INPUT.nextLine();
 
             // exit from library
             if(audioName.equals("0"))

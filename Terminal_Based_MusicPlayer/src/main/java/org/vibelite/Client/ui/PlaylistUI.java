@@ -27,7 +27,7 @@ public class PlaylistUI
 
             System.out.print("Enter Command: ");
 
-            String command = INPUT.nextLine();
+            var command = INPUT.nextLine();
 
             switch(command)
             {
@@ -53,7 +53,7 @@ public class PlaylistUI
                 case "2":
                     System.out.print("Enter Playlist name: ");
 
-                    String playlistName = INPUT.nextLine();
+                    var playlistName = INPUT.nextLine();
 
                     //validate if playlist is already available or not
                     while(playlist.contains(playlistName))
@@ -78,7 +78,9 @@ public class PlaylistUI
 
                         System.out.print("Playlist not found please enter correct name or 0 to exit: ");
 
+                        // giving option to user to exit from listening playlist
                         playlistName = INPUT.nextLine();
+
                         if(playlistName.equals("0"))
                         {
                             break;
