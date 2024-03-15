@@ -97,8 +97,6 @@ public class PlaybackManager
     {
         closeAudio();
 
-        System.out.println(musicQueue);
-
         var lastAudio = musicQueue.pop();
 
         if(musicQueue.isEmpty())
@@ -109,6 +107,10 @@ public class PlaybackManager
         {
             return musicQueue.pop();
         }
+    }
+
+    public void resetQueue(){
+        musicQueue.clear();
     }
 
 }

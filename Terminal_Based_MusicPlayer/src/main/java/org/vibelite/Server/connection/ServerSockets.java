@@ -21,8 +21,10 @@ public class ServerSockets
         this.executorService = Executors.newCachedThreadPool();
     }
 
-    public void start(){
-        try(ServerSocket serverSocket = new ServerSocket(port);){
+    public void start()
+    {
+        try(var serverSocket = new ServerSocket(port))
+        {
 
             System.out.println("server started on port: " + port);
 
@@ -34,14 +36,12 @@ public class ServerSockets
 
                 executorService.execute(clientHandler);
             }
-        } catch(IOException e)
+        }
+        catch(IOException e)
         {
             System.out.println("(ERROR) Socket is already in use cannot create same socket: " + e.getMessage());
         }
     }
 
-    public void stop()
-    {
-        executorService.shutdown();
-    }
+    // TODO :- either use it or remove it... : Done (removed)
 }

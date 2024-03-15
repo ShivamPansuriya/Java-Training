@@ -1,6 +1,8 @@
 package org.vibelite.Server.handler;
 
+import org.json.JSONObject;
 import org.vibelite.Server.ServerApplication;
+import static org.vibelite.Server.utils.Constants.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -19,7 +21,8 @@ public class ServerRequestHandler
         try
         {
             this.response = new ObjectOutputStream(socket.getOutputStream());
-        } catch(IOException e)
+        }
+        catch(IOException e)
         {
             System.out.println("(Error) cannot write on outputStream: " + e.getMessage());
         }
@@ -33,22 +36,27 @@ public class ServerRequestHandler
         try
         {
             response.writeObject(files);
-        } catch(IOException e)
+        }
+        catch(IOException e)
         {
             System.out.println("(Error) cannot send Library: " + e.getMessage());
         }
     }
 
-    public void streamAudioFile(String audioName){
+    public void streamAudioFile(String audioName)
+    {
         audioStreamer.streamAudioToClient(audioName);
     }
 
-    public void sendAudioFile(String audioName){
+    public void sendAudioFile(String audioName)
+    {
 
         try
         {
+            // TODO:- audioStreamer.sendAudioToClient() may return null...
             response.writeObject(audioStreamer.sendAudioToClient(audioName).toString());
-        } catch(IOException e)
+        }
+        catch(IOException e)
         {
             System.out.println("(ERROR) cannot send audio file to client");
         }
@@ -63,12 +71,13 @@ public class ServerRequestHandler
     {
         audioStreamer.saveAudioFromClient(audioJSON);
     }
-    public void sendPlaylistName()
+    public void sendPlaylistNames()
     {
         try
         {
             response.writeObject(ServerApplication.musicLibrary.getPlayListNames());
-        } catch(IOException e)
+        }
+        catch(IOException e)
         {
             System.out.println("(Error) cannot send Playlist: " + e.getMessage());
         }
@@ -79,17 +88,45 @@ public class ServerRequestHandler
         try
         {
             response.writeObject(ServerApplication.musicLibrary.getPlaylists(playlistName));
-        } catch(IOException e)
+        }
+        catch(IOException e)
         {
             System.out.println("(Error) cannot send Playlist: " + e.getMessage());
         }
     }
 
-    public void addToPlaylist(String audioName){
+    public void updateToPlaylist(String command,String audioName)
+    {
 
-        var inputIdentifier = audioName.split(" ");
-        // playlist name + audio name
-        ServerApplication.musicLibrary.addToPlaylist(inputIdentifier[0], inputIdentifier[1]);
+        try
+        {
+            var inputIdentifier = audioName.split(PATH_SEPARATOR);
+
+            if(inputIdentifier.length != 2)
+                response.writeObject("(ERROR) Not valid input");
+
+            // playlist name + audio name
+            var message = ServerApplication.musicLibrary.updatePlaylist(command,inputIdentifier[0], inputIdentifier[1]);
+
+            response.writeObject(message + inputIdentifier[0]);
+        }
+        catch(IOException e)
+        {
+            System.out.println("client is disconnected cannot send message");
+        }
     }
 
+    public void removePlaylist(String playlistName)
+    {
+        try
+        {
+
+            ServerApplication.musicLibrary.updatePlaylist(playlistName);
+
+            response.writeObject("Successfully deleted playlist " + playlistName);
+        } catch(IOException e)
+        {
+            System.out.println("client is disconnected cannot send message");
+        }
+    }
 }

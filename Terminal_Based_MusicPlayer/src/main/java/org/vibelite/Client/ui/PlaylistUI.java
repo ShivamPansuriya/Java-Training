@@ -18,12 +18,9 @@ public class PlaylistUI
         {
             var playlist = clientRequestHandler.requestPlaylist();
 
-//            Scanner input = new Scanner(System.in);
-            System.out.println("-------------------------------");
-            System.out.println(TAB + TAB +TAB +"PLAYLIST");
-            System.out.println("-------------------------------");
+            TerminalUI.menu(PLAYLIST_PLAYER_ID);
 
-            System.out.println("1) Show playlists" + TAB + "2) Create playlist" + TAB + "3) Listen playlist" + TAB + "0) Exit playlist");
+            System.out.println("1) Show playlists" + TAB + "2) Create playlist" + TAB + "3) Listen playlist" + TAB+ "4) Delete playlist"+ TAB + "0) Exit playlist");
 
             System.out.print("Enter Command: ");
 
@@ -56,9 +53,9 @@ public class PlaylistUI
                     var playlistName = INPUT.nextLine();
 
                     //validate if playlist is already available or not
-                    while(playlist.contains(playlistName))
+                    while(playlist.contains(playlistName) || playlistName.contains(PATH_SEPARATOR))
                     {
-                        System.out.print("Playlist already available please entre another name to create playlist: ");
+                        System.out.print("Playlist already available or '/' is not allowed"+NEWLINE+"please entre another name to create playlist: ");
 
                         playlistName = INPUT.nextLine();
                     }
@@ -87,10 +84,30 @@ public class PlaylistUI
                         }
                     }
 
-                    // start playing playlist
-                    if(!playlistName.equals("0"))
-                        clientRequestHandler.playPlaylist(playlistName);
+                    if(playlistName.equals("0"))
+                        break;
 
+                    LibraryUI libraryUI = new LibraryUI(clientRequestHandler);
+
+                    libraryUI.library(playlistName);
+
+                    break;
+
+                case "4":
+                    System.out.print("Enter playlist name you want to delete: ");
+
+                    playlistName = INPUT.nextLine();
+
+                    //validate if playlist is already available or not
+                    while(!clientRequestHandler.requestUpdatePlaylist(playlistName))
+                    {
+                        System.out.print("enter correct playlist name or 0 to exit: ");
+
+                        command = INPUT.nextLine();
+
+                        if(command.equals("0"))
+                            break;
+                    }
                     break;
 
                 default:

@@ -1,6 +1,7 @@
 package org.vibelite.Client.handler;
 
 import org.vibelite.Client.ui.TerminalUI;
+import static org.vibelite.Client.utils.Constants.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -17,22 +18,11 @@ public class ClientRequestHandler
 
     private ObjectInputStream response;
 
-    private List<String> audioFiles;
-
-    private List<String> playlist;
-
-
-    private List<String> availablePlaylist;
-
     private AudioStreamer audioStreamer;
 
     public ClientRequestHandler(Socket clientSocket)
     {
         audioStreamer = new AudioStreamer(clientSocket);
-
-        audioFiles = new ArrayList<>();
-
-        availablePlaylist = new ArrayList<>();
 
         try
         {
@@ -52,8 +42,9 @@ public class ClientRequestHandler
 
     public List<String> requestLibrary()
     {
+        List<String> audioFiles = new ArrayList<>();
         //sending request type
-        request.println("library");
+        request.println(REQUEST_LIBRARY);
         try
         {
             audioFiles = (List<String>) response.readObject();
@@ -72,28 +63,14 @@ public class ClientRequestHandler
         return audioFiles;
     }
 
-    public void requestNextAudio(String currentAudio, String playedFrom){
+    public void requestNextAudio(String currentAudio, String playedFrom)
+    {
 
         int size,currentIndex, nextIndex;
 
-        if(playedFrom.equals("playlist")){
-            //get size of playlist
-            size = playlist.size();
+        if(playedFrom.equals(LIBRARY_PLAYER_ID)){
 
-            //finding index of current playing audio
-            currentIndex = playlist.indexOf(currentAudio);
-
-            //determining next audio index
-            nextIndex = (currentIndex < size-1)? ++currentIndex : 0;
-
-            //finding next audio name
-            String audioName = playlist.get(nextIndex);
-
-            //request server for audio file
-            requestAudio(audioName, playedFrom);
-        }
-        else
-        {
+            var audioFiles = requestLibrary();
             //get size of library
             size= audioFiles.size();
 
@@ -109,21 +86,41 @@ public class ClientRequestHandler
             //request server for audio file
             requestAudio(audioName, playedFrom);
         }
+        else
+        {
+            var playlistTracks = playPlaylist(playedFrom);
+            //get size of playlist
+            size = playlistTracks.size();
+
+            //finding index of current playing audio
+            currentIndex = playlistTracks.indexOf(currentAudio);
+
+            //determining next audio index
+            nextIndex = (currentIndex < size-1)? ++currentIndex : 0;
+
+            //finding next audio name
+            String audioName = playlistTracks.get(nextIndex);
+
+            //request server for audio file
+            requestAudio(audioName, playedFrom);
+        }
     }
 
     public void requestAudio(String audioName, String playedFrom)
     {
         //sending request type
-        request.println("audioFile");
+        request.println(REQUEST_AUDIO_STREAMING);
 
         //sending actual request
         request.println(audioName);
 
+        //start playing audio
         audioStreamer.receiveAndPlayAudio(terminalUI , audioName, playedFrom);
 
     }
 
-    public void uploadAudio(){
+    public void uploadAudio()
+    {
         System.out.println("Enter audio file path: ");
 
         Scanner INPUT = new Scanner(System.in);
@@ -131,26 +128,24 @@ public class ClientRequestHandler
         var filePath = INPUT.next();
 
         //splitting file path in directories to get filename
-        var directories = filePath.trim().split("/");
+        var directories = filePath.trim().split(PATH_SEPARATOR);
 
         //extracting file name from file path array
         var fileName = directories[directories.length -1];
 
         //request library to check if audio you are trying is upload is already present or not
-        requestLibrary();
-
-        if(audioFiles.contains(fileName)){
+        if(requestLibrary().contains(fileName)){
             System.out.println("File already exists");
             return;
         }
 
         // checking if file actually exists or not and whether it is executable
-        if(Files.exists(Paths.get(filePath)) && fileName.contains("."))
+        if(Files.exists(Paths.get(filePath)) && fileName.contains(FILE_IDENTIFIER))
         {
             try
             {
                 //MIME type output for .wav file  = audio/wav
-                var fileType = Files.probeContentType(Path.of(filePath)).split("/",2);
+                var fileType = Files.probeContentType(Path.of(filePath)).split(PATH_SEPARATOR,2);
 
                 if(!(fileType[0].equals("audio") && fileType[1].contains("wav")))
                 {
@@ -158,17 +153,20 @@ public class ClientRequestHandler
 
                     return;
                 }
-            } catch (IOException e)
+            }
+            catch (IOException e)
             {
                 System.out.println("(ERROR) File with improper file format");
             }
-        } else {
+        }
+        else
+        {
             System.out.println("file not found");
             return;
         }
 
         //sending request type
-        request.println("uploadAudio");
+        request.println(REQUEST_UPLOAD);
 
         //sending audio file in json string
         request.println(audioStreamer.sendAudio(filePath, fileName).toString());
@@ -177,9 +175,10 @@ public class ClientRequestHandler
 
     }
 
-    public void downloadAudio(String audioName){
+    public void downloadAudio(String audioName)
+    {
         //sending request type
-        request.println("downloadAudio");
+        request.println(REQUEST_DOWNLOAD);
 
         //sending audio name to server that user wants to download
         request.println(audioName);
@@ -192,12 +191,14 @@ public class ClientRequestHandler
 
             //converting json object to audio file
             audioStreamer.downloadAudio(audioJSON);
-        } catch(IOException e)
+        }
+        catch(IOException e)
         {
             System.out.println("Server down");
 
             System.out.println("Retrying to establish connection");
-        } catch(ClassNotFoundException e)
+        }
+        catch(ClassNotFoundException e)
         {
             System.out.println("(ERROR) cannot assign object to string type:");
         }
@@ -207,24 +208,27 @@ public class ClientRequestHandler
     public void createPlaylist(String playlistName)
     {
         //sending request type
-        request.println("createPlaylist");
+        request.println(REQUEST_CREATE_PLAYLIST);
 
         //sending actual request
         request.println(playlistName);
     }
 
-    public List<String> requestPlaylist(){
+    public List<String> requestPlaylist()
+    {
 
         //sending request type
-        request.println("getPlaylistName");
+        request.println(REQUEST_PLAYLIST_NAMES);
 
+        List<String> playlistNames = new ArrayList<>();
         try
         {
             //response from server
-            availablePlaylist = (List<String>) response.readObject();
+            playlistNames = (List<String>) response.readObject();
 
 
-        } catch(IOException e)
+        }
+        catch(IOException e)
         {
             System.out.println("Server down");
 
@@ -236,10 +240,10 @@ public class ClientRequestHandler
             System.out.println("(ERROR) cannot assign object of other type:");
         }
 
-        return availablePlaylist;
+        return playlistNames;
     }
 
-    public boolean requestAddToPlaylist(String playlistName, String audioName)
+    public boolean requestUpdatePlaylist(String requestType, String playlistName, String audioName)
     {
         //request for available playlists
         var playlistNames = requestPlaylist();
@@ -247,9 +251,25 @@ public class ClientRequestHandler
         //check whether playlist exist or not
         if(playlistNames.contains(playlistName))
         {
-            request.println("addToPlaylist");
+            request.println(requestType);
 
-            request.println(playlistName+" "+audioName);
+            request.println(playlistName+ PATH_SEPARATOR +audioName);
+
+            try
+            {
+                System.out.println((String) response.readObject());
+            }
+            catch(IOException e)
+            {
+                System.out.println("Server down");
+
+                System.out.println("Retrying to establish connection");
+
+            }
+            catch(ClassNotFoundException e)
+            {
+                System.out.println("(ERROR) cannot print object");
+            }
 
             return true;
         }
@@ -259,44 +279,73 @@ public class ClientRequestHandler
         }
 
         return false;
-
     }
 
-    public void playPlaylist(String playlistName)
+    public boolean requestUpdatePlaylist(String playlistName)
+    {
+        //request for available playlists
+        var playlistNames = requestPlaylist();
+
+        //check whether playlist exist or not
+        if(playlistNames.contains(playlistName))
+        {
+            request.println(REQUEST_REMOVE_PLAYLIST);
+
+            request.println(playlistName);
+
+            try
+            {
+                System.out.println((String) response.readObject());
+            }
+            catch(IOException e)
+            {
+                System.out.println("Server down");
+
+                System.out.println("Retrying to establish connection");
+
+            }
+            catch(ClassNotFoundException e)
+            {
+                System.out.println("(ERROR) cannot print object");
+            }
+            return true;
+        }
+        else
+        {
+            System.out.println("No such playlist exists");
+        }
+        return false;
+    }
+
+    public List<String> playPlaylist(String playlistName)
     {
         //request type
-        request.println("getPlaylist");
+        request.println(REQUEST_PLAYLIST);
 
         //sending actual request
         request.println(playlistName);
 
+        List<String> playlistTracks = new ArrayList<>();
         try
         {
             //response from server
-            playlist = (List<String>) response.readObject();
+            playlistTracks = (List<String>) response.readObject();
 
-            if(playlist.isEmpty())
-            {
-                System.out.println("Playlist is Empty");
-            }
-            else
-            {
-                requestAudio(playlist.get(0), "playlist");
-            }
-
-
-        } catch(IOException e)
+        }
+        catch(IOException e)
         {
             System.out.println("(ERROR) Cannot read file: ");
-        } catch(ClassNotFoundException e)
+        }
+        catch(ClassNotFoundException e)
         {
             System.out.println("(ERROR) incompatible object types");
         }
+        return playlistTracks;
     }
     public void closeConnection(){
 
         // because closing the connection needs time and without it server application reader thread was showing exception(never stops programing)
-        request.println("exit");
+        request.println(REQUEST_EXIT);
 
     }
 

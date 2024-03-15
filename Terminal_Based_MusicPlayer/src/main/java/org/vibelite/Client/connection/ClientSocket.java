@@ -36,7 +36,7 @@ public class ClientSocket
 
         } catch(IOException e)
         {
-            System.out.println("Socket you are trying to connect is not available");
+            System.out.println("Server you are trying to connect is not available");
 
             try
             {

@@ -71,6 +71,8 @@ public class AudioStreamer
 
     public JSONObject sendAudio(String filePath, String fileName)
     {
+        // Prepare JSON object
+        JSONObject audioJson = new JSONObject();
         try
         {
             var file = new File(filePath);
@@ -84,24 +86,19 @@ public class AudioStreamer
             // Encode audio data as Base64
             String encodedAudio = java.util.Base64.getEncoder().encodeToString(fileData);
 
-            // Prepare JSON object
-            JSONObject audioJson = new JSONObject();
-
             audioJson.put("filename", fileName);
 
             audioJson.put("content", encodedAudio);
 
-
-
             fileInputStream.close();
 
-            // Send JSON data
-            return audioJson;
+
         } catch(IOException e)
         {
             System.out.println("(ERROR) Cannot read File it may be corrupted");
         }
-        return null;
+        // Send JSON data
+        return audioJson;
     }
 
 

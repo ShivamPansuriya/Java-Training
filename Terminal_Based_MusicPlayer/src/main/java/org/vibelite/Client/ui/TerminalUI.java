@@ -6,7 +6,6 @@ import org.vibelite.Client.handler.PlaybackManager;
 import static org.vibelite.Client.utils.Constants.*;
 
 import javax.sound.sampled.Clip;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class TerminalUI
@@ -16,6 +15,9 @@ public class TerminalUI
     private static PlaybackManager playbackManager;
 
     private final ClientRequestHandler clientRequestHandler;
+
+    // used to decide whether to empty playing queue or not.
+    private String previousPlayerName = LIBRARY_PLAYER_ID;
 
     public TerminalUI(ClientSocket clientSocket, ClientRequestHandler clientRequestHandler)
     {
@@ -33,13 +35,14 @@ public class TerminalUI
         var playlistUI = new PlaylistUI(clientRequestHandler);
 
         var libraryUI = new LibraryUI(clientRequestHandler);
+
         while(true)
         {
             System.out.println("-------------------------------");
             System.out.println(TAB + TAB +TAB +"Menu");
             System.out.println("-------------------------------");
 
-            var commandOption = "1) Playlist"  + NEWLINE +"2) Library" + NEWLINE +"3) Upload music" + NEWLINE + "0) Exit from application" +NEWLINE+ "Enter Command:";
+            var commandOption = "1) "+PLAYLIST_PLAYER_ID.toLowerCase()  + NEWLINE +"2) " + LIBRARY_PLAYER_ID.toLowerCase() + NEWLINE +"3) Upload music" + NEWLINE + "0) Exit from application" +NEWLINE+ "Enter Command:";
 
             System.out.print(commandOption);
 
@@ -57,7 +60,7 @@ public class TerminalUI
                 case "2":
                     System.out.println();
 
-                    libraryUI.library();
+                    libraryUI.library(LIBRARY_PLAYER_ID);
 
                     break;
 
@@ -82,15 +85,27 @@ public class TerminalUI
         }
     }
 
+    public static void menu(String playerName){
+        System.out.println("-------------------------------");
+        System.out.println(TAB + TAB + TAB + playerName);
+        System.out.println("-------------------------------");
+    }
+
     public void AudioPlayerUI(Clip clip, String audioName, String playedFrom)
     {
+        if(!previousPlayerName.equals(playedFrom))
+        {
+            playbackManager.resetQueue();
+            previousPlayerName = playedFrom;
+        }
+
         // to enable playbackManager to handle audio file
         playbackManager.setClip(clip);
 
         // set the name of current playing audio
         playbackManager.setAudio(audioName);
 
-        System.out.println("Playing audio: " + playbackManager.getAudio());
+        System.out.println(NEWLINE + "Playing audio: " + playbackManager.getAudio());
 
         //display audio length in seconds
         System.out.println("Audio length: " + clip.getMicrosecondLength()/1000000 + "sec");
@@ -140,7 +155,7 @@ public class TerminalUI
                     command = INPUT.nextLine();
 
                     //check if the given input is valid playlist name
-                    while(!clientRequestHandler.requestAddToPlaylist(command,playbackManager.getAudio()))
+                    while(!clientRequestHandler.requestUpdatePlaylist(REQUEST_ADDTO_PLAYLIST,command,playbackManager.getAudio()))
                     {
                         System.out.print("enter correct playlist name or 0 to exit: ");
 

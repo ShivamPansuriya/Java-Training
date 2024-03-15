@@ -2,17 +2,14 @@ package org.vibelite.Server.handler;
 
 import org.json.JSONObject;
 import org.vibelite.Server.ServerApplication;
+import static org.vibelite.Server.utils.Constants.*;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.util.Map;
 
 public class AudioStreamer
 {
     private final Socket clientSocket;
-
-    private final int BUFFER_SIZE = 4096; // Buffer size for reading and writing
 
     AudioStreamer(Socket clientSocket)
     {
@@ -23,48 +20,54 @@ public class AudioStreamer
     {
         var audioFiles = ServerApplication.musicLibrary.getAudioFileMapper();
 
-        var requested_file = audioFiles.get(audioName);
+        // TODO :- change variable name...  : Done
+        var fileStreaming = audioFiles.get(audioName);
 
         try
         {
-            var bis = new BufferedInputStream(new FileInputStream(requested_file));
+            // TODO :- change name...  : Done
+            var fileBuffer = new BufferedInputStream(new FileInputStream(fileStreaming));
 
-            var os = clientSocket.getOutputStream();
+            var writer = clientSocket.getOutputStream();
 
             byte[] buffer = new byte[BUFFER_SIZE];
 
             int bytesRead;
 
-            while((bytesRead = bis.read(buffer)) != -1)
+            while((bytesRead = fileBuffer.read(buffer)) != -1)
             {
-                os.write(buffer, 0, bytesRead);
+                writer.write(buffer, 0, bytesRead);
 
-                os.flush();
+                writer.flush();
             }
 
-            System.out.println("Sent " + requested_file + " to client.");
-        } catch(IOException e)
+            System.out.println("Sent " + audioName + " to client.");
+        }
+        catch(IOException e)
         {
             System.out.println("(ERROR) cannot Stream audio: " + e.getMessage());
         }
 
     }
-    public void saveAudioFromClient(String audioJSON)
+    public void saveAudioFromClient(String audioJson)
     {
         try
         {
-            var audioJson = new JSONObject(audioJSON);
+            var audioJSON = new JSONObject(audioJson);
 
             // Decode Base64 audio data - gives array of byte
-            var audioData = java.util.Base64.getDecoder().decode(audioJson.getString("content"));
+            var audioData = java.util.Base64.getDecoder().decode(audioJSON.getString("content"));
 
             // Write audio data to a file
-            FileOutputStream fos = new FileOutputStream("./src/main/resources/Audio/"+audioJson.getString("filename"));
+            FileOutputStream fos = new FileOutputStream(AUDIO_DIRECTORY+audioJSON.getString("filename"));
 
             fos.write(audioData);
 
             fos.close();
-        } catch(IOException e)
+
+            ServerApplication.musicLibrary.updateAudioFiles(audioJSON.getString("filename"));
+        }
+        catch(IOException e)
         {
             System.out.println("(ERROR) cannot download file or data lost");
         }
@@ -73,37 +76,39 @@ public class AudioStreamer
     public JSONObject sendAudioToClient(String audioName)
     {
         var audioFiles = ServerApplication.musicLibrary.getAudioFileMapper();
+
+        // Prepare JSON object
+        var audioJson = new JSONObject();
+
         try
         {
-            File file = audioFiles.get(audioName);
+            var file = audioFiles.get(audioName);
 
-            var fileData = new byte[(int) file.length()];
+            // TODO :- change name...  : Done
+            var fileDataBuffer = new byte[(int) file.length()];
 
-            var  fileInputStream = new FileInputStream(file);
+            var fileInputStream = new FileInputStream(file);
 
-            fileInputStream.read(fileData);
+            fileInputStream.read(fileDataBuffer);
 
             // Encode audio data as Base64
-            String encodedAudio = java.util.Base64.getEncoder().encodeToString(fileData);
+            var encodedAudio = java.util.Base64.getEncoder().encodeToString(fileDataBuffer);
 
-            // Prepare JSON object
-            var audioJson = new JSONObject();
-
+            // Populating JSON object
             audioJson.put("filename", audioName);
 
             audioJson.put("content", encodedAudio);
 
-
-
+            //Closing file after reading
             fileInputStream.close();
 
-            // Send JSON data
-            return audioJson;
-
-        } catch(IOException e)
+        }
+        catch(IOException e)
         {
             System.out.println("(ERROR) Cannot read File it may be corrupted");
         }
-        return null;
+
+        // Send JSON data
+        return audioJson;
     }
 }
