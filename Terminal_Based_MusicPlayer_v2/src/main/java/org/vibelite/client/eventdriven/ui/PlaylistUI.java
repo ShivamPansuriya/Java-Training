@@ -5,20 +5,15 @@ import static org.vibelite.client.eventdriven.utils.Constants.*;
 
 import java.io.IOException;
 
-public class PlaylistUI
+public class PlaylistUI extends TerminalUI
 {
-    private final ClientSocket clientSocket;
-    PlaylistUI(ClientSocket clientSocket)
-    {
-        this.clientSocket = clientSocket;
-    }
     public void playlist() throws IOException, NullPointerException
     {
         while(true)
         {
             var playlist = clientSocket.connect().requestPlaylist();
 
-            TerminalUI.menu(PLAYLIST_PLAYER_ID);
+            menu(PLAYLIST_PLAYER_ID);
 
             System.out.println("1) Show playlists" + TAB + "2) Create playlist" + TAB + "3) Listen playlist" + TAB+ "4) Delete playlist"+ TAB + "0) Exit playlist");
 
@@ -87,7 +82,7 @@ public class PlaylistUI
                     if(playlistName.equals("0"))
                         break;
 
-                    LibraryUI libraryUI = new LibraryUI(clientSocket);
+                    LibraryUI libraryUI = new LibraryUI();
 
                     libraryUI.library(playlistName);
 

@@ -84,7 +84,7 @@ public class AudioStreamer
 
 
 
-    public void sendAudios(String filePath)
+    public void sendAudioToServer(String filePath)
     {
         File fileToSend = new File(filePath);
 

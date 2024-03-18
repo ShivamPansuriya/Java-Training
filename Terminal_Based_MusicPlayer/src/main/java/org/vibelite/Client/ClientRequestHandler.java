@@ -1,7 +1,5 @@
 package org.vibelite.Client;
 
-import org.vibelite.Client.ui.TerminalUI;
-
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;

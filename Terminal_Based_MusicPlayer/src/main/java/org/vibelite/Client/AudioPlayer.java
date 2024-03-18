@@ -1,6 +1,5 @@
 package org.vibelite.Client;
 
-import org.vibelite.Client.ui.TerminalUI;
 
 import javax.sound.sampled.*;
 import java.io.*;

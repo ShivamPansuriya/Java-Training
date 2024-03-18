@@ -15,23 +15,28 @@ public class ClientSocket
 
     private  Socket socket;
 
-    public ClientRequestHandler connect(){
+    public ClientRequestHandler connect()
+    {
         ClientRequestHandler requestHandler = null;
-        try{
+
+        try
+        {
             //establish connection with server
             socket = new Socket(serverIP,serverPort);
 
             // create single clientRequestHandler object
             requestHandler = new ClientRequestHandler(socket);
 
-        } catch(IOException e)
+        }
+        catch(IOException e)
         {
             System.out.println("Server you are trying to connect is not available");
 
             try
             {
                 Thread.sleep(5000);
-            } catch(InterruptedException ex)
+            }
+            catch(InterruptedException ex)
             {
                 System.out.println("(FATAL ERROR)");
             }
@@ -40,9 +45,12 @@ public class ClientSocket
     }
 
     public void disconnect() {
-        try {
+        try
+        {
             socket.close();
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             System.out.println("Cannot disconnect socket connection");
         }
     }

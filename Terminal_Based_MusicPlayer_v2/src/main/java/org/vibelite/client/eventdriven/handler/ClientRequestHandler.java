@@ -37,7 +37,8 @@ public class ClientRequestHandler
             this.request = new PrintWriter(clientSocket.getOutputStream(), true);
 
             this.reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        } catch(IOException e)
+        }
+        catch(IOException e)
         {
             System.out.println("(ERROR) cannot read or write from socket stream: " + e.getMessage());
         }
@@ -186,9 +187,9 @@ public class ClientRequestHandler
         //sending file name which client is sending
         request.println(fileName);
 
-        audioStreamer.sendAudios(filePath);
-        System.out.println("success");
+        audioStreamer.sendAudioToServer(filePath);
 
+        System.out.println("success");
     }
 
     public void downloadAudio(String audioName) throws IOException

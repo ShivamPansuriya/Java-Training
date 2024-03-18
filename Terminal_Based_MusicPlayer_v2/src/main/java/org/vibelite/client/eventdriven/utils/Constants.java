@@ -5,9 +5,9 @@ import java.util.Scanner;
 public class Constants
 {
 
-    public static final int PORT = 6000;
+    public static final int PORT = 6001;
 
-    public static final String  IP_ADDRESS = "10.20.40.239";
+    public static final String  IP_ADDRESS = "localhost";
 
     public static final int BUFFER_SIZE = 4096; // Buffer size for reading and writing
 

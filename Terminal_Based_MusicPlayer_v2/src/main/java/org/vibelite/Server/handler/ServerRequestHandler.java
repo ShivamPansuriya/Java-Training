@@ -2,6 +2,8 @@ package org.vibelite.Server.handler;
 
 import org.json.JSONObject;
 import org.vibelite.Server.ServerApplication;
+import org.vibelite.Server.fileloader.MusicLibrary;
+
 import static org.vibelite.Server.utils.Constants.*;
 
 import java.io.*;
@@ -31,9 +33,9 @@ public class ServerRequestHandler
     public void sendLibrary()
     {
 
-        JSONObject fileJSON = new JSONObject();
+        var fileJSON = new JSONObject();
 
-        fileJSON.put(REQUEST_LIBRARY,ServerApplication.musicLibrary.getAudioFilename());
+        fileJSON.put(REQUEST_LIBRARY, MusicLibrary.getAudioFilename());
 
         writer.println(fileJSON);
     }
@@ -52,7 +54,7 @@ public class ServerRequestHandler
 
     public void createPlaylist(String playlistName)
     {
-        ServerApplication.musicLibrary.createPlaylist(playlistName);
+        MusicLibrary.createPlaylist(playlistName);
     }
 
     public void saveAudioFile(String audioName)
@@ -61,16 +63,18 @@ public class ServerRequestHandler
     }
     public void sendPlaylistNames()
     {
-        JSONObject json = new JSONObject();
-        json.put(REQUEST_PLAYLIST_NAMES, ServerApplication.musicLibrary.getPlayListNames());
+        var json = new JSONObject();
+
+        json.put(REQUEST_PLAYLIST_NAMES, MusicLibrary.getPlayListNames());
 
         writer.println(json);
     }
 
     public void sendPlaylist(String playlistName)
     {
-        JSONObject json = new JSONObject();
-        json.put(REQUEST_PLAYLIST,ServerApplication.musicLibrary.getPlaylists(playlistName));
+        var json = new JSONObject();
+
+        json.put(REQUEST_PLAYLIST,MusicLibrary.getPlaylists(playlistName));
 
         writer.println(json);
     }
@@ -88,14 +92,14 @@ public class ServerRequestHandler
         }
 
         // playlist name + audio name
-        var message = ServerApplication.musicLibrary.updatePlaylist(command,inputIdentifier[0], inputIdentifier[1]);
+        var message = MusicLibrary.updatePlaylist(command,inputIdentifier[0], inputIdentifier[1]);
 
         writer.println(message + inputIdentifier[0]);
     }
 
     public void removePlaylist(String playlistName)
     {
-        ServerApplication.musicLibrary.updatePlaylist(playlistName);
+        MusicLibrary.updatePlaylist(playlistName);
 
         writer.println("Successfully deleted playlist " + playlistName);
     }

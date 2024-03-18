@@ -13,8 +13,9 @@ public class ClientApplication
 
         try
         {
-            terminalUI.start();
-        } catch(IOException e)
+            new TerminalUI().start();//terminalUI.start();
+        }
+        catch(IOException e)
         {
             System.out.println("(ERROR) cannot close the connection");
         }

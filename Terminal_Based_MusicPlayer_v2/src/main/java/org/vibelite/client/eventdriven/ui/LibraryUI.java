@@ -1,20 +1,13 @@
 package org.vibelite.client.eventdriven.ui;
 
-import org.vibelite.client.eventdriven.connection.ClientSocket;
 import static org.vibelite.client.eventdriven.utils.Constants.*;
 
 import java.io.IOException;
 import java.util.List;
 
 
-public class LibraryUI
+public class LibraryUI extends TerminalUI
 {
-    private ClientSocket clientSocket;
-    public LibraryUI(ClientSocket clientSocket)
-    {
-        this.clientSocket = clientSocket;
-    }
-
     public void library(String playerName) throws IOException, NullPointerException
     {
         while(true)
@@ -26,7 +19,7 @@ public class LibraryUI
                 // list all files that are available in library;
                 audioFiles = clientSocket.connect().requestLibrary();
 
-                TerminalUI.menu(LIBRARY_PLAYER_ID);
+                menu(LIBRARY_PLAYER_ID);
                 if(audioFiles.isEmpty())
                 {
                     System.out.println("Library is empty!!");
@@ -38,7 +31,7 @@ public class LibraryUI
                 // list all files that are available in selected playlist
                 audioFiles = clientSocket.connect().playPlaylist(playerName);
 
-                TerminalUI.menu(playerName);
+                menu(playerName);
 
                 if(audioFiles.isEmpty())
                 {

@@ -3,55 +3,57 @@ package org.vibelite.Server.fileloader;
 import static org.vibelite.Server.utils.Constants.*;
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class MusicLibrary
 {
 
     // TODO :- remove redundant data structure : Done
-    private final Map<String, File> audioFileMapper;
+    private static final Map<String, File> audioFileMapper;
 
-    private final Map<String, Set<String>> playlistMapper;
+    private static final Map<String, Set<String>> playlistMapper;
 
-    public MusicLibrary()
-    {
-        this.audioFileMapper = new HashMap<>();
-
-        this.playlistMapper = new HashMap<>();
-    }
-
-    public void loadAudioFile()
+    static
     {
         //making arraylist(will store relative FILE path) of audio file that has .mp3 and .wav files
         // TODO - make constant for current_directory and path separator : Done
+        //todo - make constant of .mp3 and .wav : Done
+        // TODO - make static block : Done
+
+        playlistMapper = new ConcurrentHashMap<>();
+
+        audioFileMapper = new ConcurrentHashMap<>();
+
         var audioDirectory = new File(AUDIO_DIRECTORY);
 
-        var audioFiles = Arrays.stream(audioDirectory.listFiles((dir, name) -> name.endsWith(".mp3") || name.endsWith(".wav"))).toList();
+        var audioFiles = Arrays.stream(audioDirectory.listFiles((dir, name) -> name.endsWith(WAV_EXTENSION))).toList();
 
         for (var file : audioFiles)
         {
             audioFileMapper.put(file.getName(), file);
         }
+        System.out.println("Done");
     }
-
-    public void createPlaylist(String playlistName)
+    public static void createPlaylist(String playlistName)
     {
         playlistMapper.put(playlistName,new HashSet<>());
     }
 
-    public List<String> getPlayListNames()
+    public static List<String> getPlayListNames()
     {
         return playlistMapper.keySet().stream().toList();
     }
 
-    public List<String> getPlaylists(String playlistName)
+    public static List<String> getPlaylists(String playlistName)
     {
         return playlistMapper.get(playlistName).stream().toList();
     }
 
-    public String updatePlaylist(String command,String playlistName, String audioName)
+    public static String updatePlaylist(String command,String playlistName, String audioName)
     {
-        var message="";
+        var message = "";
+        // TODO - check if object is null or not before performing operation
         if(command.equals(REQUEST_ADDTO_PLAYLIST))
         {
             playlistMapper.get(playlistName).add(audioName);
@@ -67,25 +69,26 @@ public class MusicLibrary
         return  message;
     }
 
-    public void updatePlaylist(String playlistName)
+    public static void updatePlaylist(String playlistName)
     {
         playlistMapper.remove(playlistName);
     }
 
-    public void updateAudioFiles(String audioName)
+    public static void updateAudioFiles(String audioName)
     {
         //when user upload audio file we will update audioFileMapper
         audioFileMapper.put(audioName,new File(AUDIO_DIRECTORY+audioName));
     }
-    public List<String> getAudioFilename()
+    public static List<String> getAudioFilename()
     {
         // TODO :- change this approach : Done
         return audioFileMapper.keySet().stream().toList();
     }
 
-    public Map<String,File> getAudioFileMapper()
+    //TODO - change this method : Done
+    public static File getAudioFile(String audioName)
     {
-        return audioFileMapper;
+        return audioFileMapper.get(audioName);
     }
 
 }

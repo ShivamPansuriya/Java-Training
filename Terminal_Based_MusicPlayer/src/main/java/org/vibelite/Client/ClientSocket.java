@@ -1,7 +1,5 @@
 package org.vibelite.Client;
 
-import org.vibelite.Client.ui.TerminalUI;
-
 import java.io.IOException;
 import java.net.Socket;
 

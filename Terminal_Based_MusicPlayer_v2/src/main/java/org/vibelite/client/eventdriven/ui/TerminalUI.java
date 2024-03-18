@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class TerminalUI
 {
-    private final ClientSocket clientSocket;
+    protected final ClientSocket clientSocket;
     private static PlaybackManager playbackManager;
 
     // used to decide whether to empty playing queue or not.
@@ -29,9 +29,9 @@ public class TerminalUI
     {
         ClientRequestHandler.terminalUI = this;
 
-        var playlistUI = new PlaylistUI(clientSocket);
+        var playlistUI = new PlaylistUI();
 
-        var libraryUI = new LibraryUI(clientSocket);
+        var libraryUI = new LibraryUI();
 
         while(true)
         {
@@ -83,7 +83,7 @@ public class TerminalUI
         }
     }
 
-    public static void menu(String playerName){
+    public void menu(String playerName){
         System.out.println("-------------------------------");
         System.out.println(TAB + TAB + TAB + playerName);
         System.out.println("-------------------------------");
