@@ -13,16 +13,20 @@ import java.util.Scanner;
 public class TerminalUI
 {
     protected final ClientSocket clientSocket;
-    private static PlaybackManager playbackManager;
+    private static final PlaybackManager playbackManager;
 
     // used to decide whether to empty playing queue or not.
     private String previousPlayerName = LIBRARY_PLAYER_ID;
 
+    protected LibraryUI libraryUI = new LibraryUI();
+
+    static
+    {
+        playbackManager = new PlaybackManager();
+    }
     public TerminalUI()
     {
         this.clientSocket = new ClientSocket();
-
-        playbackManager = new PlaybackManager();
     }
 
     public void start() throws IOException
@@ -31,7 +35,7 @@ public class TerminalUI
 
         var playlistUI = new PlaylistUI();
 
-        var libraryUI = new LibraryUI();
+
 
         while(true)
         {

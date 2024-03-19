@@ -82,8 +82,6 @@ public class PlaylistUI extends TerminalUI
                     if(playlistName.equals("0"))
                         break;
 
-                    LibraryUI libraryUI = new LibraryUI();
-
                     libraryUI.library(playlistName);
 
                     break;
