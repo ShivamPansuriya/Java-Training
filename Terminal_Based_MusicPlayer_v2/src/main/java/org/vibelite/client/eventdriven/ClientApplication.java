@@ -13,7 +13,7 @@ public class ClientApplication
 
         try
         {
-            new TerminalUI().start();//terminalUI.start();
+            terminalUI.start();//terminalUI.start();
         }
         catch(IOException e)
         {
