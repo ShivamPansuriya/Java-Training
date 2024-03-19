@@ -1,24 +1,52 @@
 package org.vibelite.Server.connection;
 
+import org.json.JSONObject;
 import org.vibelite.Server.handler.ClientHandler;
+import org.vibelite.client.eventdriven.ClientApplication;
 
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.net.ServerSocket;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class ServerSockets
 {
     private final int port;
 
-    private final ExecutorService executorService;
+    private final ThreadPoolExecutor executorService;
 
-    public ServerSockets(int port)
+    public ServerSockets()
     {
-        this.port = port;
+        var config = loadConfig();
 
-        this.executorService = Executors.newCachedThreadPool();
+        this.port = config.getInt("PORT");
+
+        this.executorService = new ThreadPoolExecutor(config.getInt("CORE_POOL_SIZE"), config.getInt("MAXIMUM_POOL_SIZE"), config.getInt("KEEP_ALIVE_TIME"), TimeUnit.SECONDS, new ArrayBlockingQueue<>(config.getInt("BLOCKING_QUEUE_CAPACITY")));
+    }
+
+    private JSONObject loadConfig()
+    {
+        try(var inputStream = new FileInputStream("config.json"))
+        {
+            var buffer = inputStream.readAllBytes();
+
+            var jsonText = new String(buffer);
+
+            ClientApplication.logger.info("read config file: " + jsonText);
+
+            return new JSONObject(jsonText);
+
+        }
+        catch(IOException e)
+        {
+            System.out.println("Error reading configuration file: ");
+
+            ClientApplication.logger.error("Error reading configuration file: " + e.getMessage());
+
+            return new JSONObject();
+        }
     }
 
     public void start()

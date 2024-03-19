@@ -1,5 +1,7 @@
 package org.vibelite.client.eventdriven.handler;
 
+import org.vibelite.client.eventdriven.ClientApplication;
+
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 import java.util.InputMismatchException;
@@ -66,12 +68,16 @@ public class PlaybackManager
             volume = INPUT.nextFloat();
         }catch(InputMismatchException e){
             System.out.println("Enter proper input");
+
+            ClientApplication.logger.error("Improper input style");
+
             return;
         }
 
         if (volume < 0f || volume > 1f)
         {
             System.out.println("Entre valid input between 0-1");
+
             return;
         }
 

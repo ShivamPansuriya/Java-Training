@@ -1,0 +1,9 @@
+{
+    "IP": "127.0.0.1",
+    "PORT": 6001,
+    "CORE_POOL_SIZE": 8,
+    "MAXIMUM_POOL_SIZE": 12,
+    "KEEP_ALIVE_TIME": 60,
+    "BLOCKING_QUEUE_CAPACITY": 100
+
+}

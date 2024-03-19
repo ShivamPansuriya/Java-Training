@@ -55,7 +55,7 @@ public class PlaylistUI extends TerminalUI
                         playlistName = INPUT.nextLine();
                     }
 
-                    clientSocket.connect().createPlaylist(playlistName);
+                    clientSocket.connect().createPlaylist(playlistName, USER);
 
                     break;
 
@@ -82,7 +82,7 @@ public class PlaylistUI extends TerminalUI
                     if(playlistName.equals("0"))
                         break;
 
-                    libraryUI.library(playlistName);
+                    new LibraryUI().library(playlistName);
 
                     break;
 
@@ -96,7 +96,7 @@ public class PlaylistUI extends TerminalUI
                     //validate if playlist is already available or not
                     if(playlist.contains(playlistName))
                     {
-                        while(!clientSocket.connect().requestUpdatePlaylist(playlistName))
+                        while(!clientSocket.connect().requestUpdatePlaylist(playlistName, USER))
                         {
                             System.out.print("enter correct playlist name or 0 to exit: ");
 

@@ -13,6 +13,7 @@ public class ServerRequestHandler
 {
     private PrintWriter writer;
 
+    private JSONObject responseJson = new JSONObject();
     private final AudioStreamer audioStreamer;
 
     ServerRequestHandler(Socket socket)
@@ -33,11 +34,13 @@ public class ServerRequestHandler
     public void sendLibrary()
     {
 
-        var fileJSON = new JSONObject();
 
-        fileJSON.put(REQUEST_LIBRARY, MusicLibrary.getAudioFilename());
+        responseJson.put(REQUEST_LIBRARY, MusicLibrary.getAudioFilename());
 
-        writer.println(fileJSON);
+        writer.println(responseJson);
+
+        ServerApplication.logger.info(responseJson.toString());
+
     }
 
     public void streamAudioFile(String audioName)
@@ -52,9 +55,24 @@ public class ServerRequestHandler
         audioStreamer.sendAudioToClients(audioName);
     }
 
-    public void createPlaylist(String playlistName)
+    public void createPlaylist(String playlistName, String username)
     {
-        MusicLibrary.createPlaylist(playlistName);
+        if(MusicLibrary.createPlaylist(playlistName, username))
+        {
+            responseJson.put(STATUS_CODE, "success");
+
+            responseJson.put(MESSAGE, "Playlist created successfully");
+        }
+        else
+        {
+            responseJson.put(STATUS_CODE, "fail");
+
+            responseJson.put(MESSAGE, "Cannot create playlist with this name");
+        }
+
+        writer.println(responseJson);
+
+        ServerApplication.logger.info(responseJson.toString());
     }
 
     public void saveAudioFile(String audioName)
@@ -68,39 +86,132 @@ public class ServerRequestHandler
         json.put(REQUEST_PLAYLIST_NAMES, MusicLibrary.getPlayListNames());
 
         writer.println(json);
+
+        ServerApplication.logger.info(responseJson.toString());
     }
 
     public void sendPlaylist(String playlistName)
     {
-        var json = new JSONObject();
+        var playlistIdentifier = playlistName.split(PLAYLIST_SEPARATOR);
 
-        json.put(REQUEST_PLAYLIST,MusicLibrary.getPlaylists(playlistName));
+        if(playlistIdentifier.length != 2)
+        {
+            responseJson.put(STATUS_CODE, "fail");
 
-        writer.println(json);
+            responseJson.put(MESSAGE, "(ERROR) Not valid input");
+
+            writer.println(responseJson);
+
+            return;
+        }
+        responseJson = new JSONObject();
+
+        responseJson.put(REQUEST_PLAYLIST,MusicLibrary.getPlaylists(playlistName,playlistIdentifier[1]));
+
+        writer.println(responseJson);
+
+        ServerApplication.logger.info(responseJson.toString());
     }
 
-    public void updateToPlaylist(String command,String audioName)
+    public void updateToPlaylist(String command,String audioName, String username)
     {
 
         var inputIdentifier = audioName.split(PATH_SEPARATOR);
 
         if(inputIdentifier.length != 2)
         {
-            writer.println("(ERROR) Not valid input");
+            responseJson.put(STATUS_CODE, "fail");
+
+            responseJson.put(MESSAGE, "(ERROR) Not valid input");
+
+            writer.println(responseJson);
 
             return;
         }
 
         // playlist name + audio name
-        var message = MusicLibrary.updatePlaylist(command,inputIdentifier[0], inputIdentifier[1]);
+        if(MusicLibrary.updatePlaylist(command,inputIdentifier[0], inputIdentifier[1], username) && command.equals(REQUEST_ADDTO_PLAYLIST))
+        {
+            responseJson.put(STATUS_CODE, "success");
 
-        writer.println(message + inputIdentifier[0]);
+            responseJson.put(MESSAGE, "Music added to playlist " + inputIdentifier[0]);
+        }
+        else if(MusicLibrary.updatePlaylist(command, inputIdentifier[0], inputIdentifier[1], username) && command.equals(REQUEST_REMOVE_FROM_PLAYLIST))
+        {
+            responseJson.put(STATUS_CODE, "success");
+
+            responseJson.put(MESSAGE, "Music removed to playlist " + inputIdentifier[0]);
+        }
+        else
+        {
+            responseJson.put(STATUS_CODE, "fail");
+
+            responseJson.put(MESSAGE, "You are not the owner of " + inputIdentifier[0]);
+        }
+
+        writer.println(responseJson);
+
+        ServerApplication.logger.info(responseJson.toString());
     }
 
-    public void removePlaylist(String playlistName)
+    public void removePlaylist(String playlistName, String username)
     {
-        MusicLibrary.updatePlaylist(playlistName);
+        if(MusicLibrary.updatePlaylist(playlistName, username))
+        {
+            responseJson.put(STATUS_CODE, "success");
 
-        writer.println("Successfully deleted playlist " + playlistName);
+            responseJson.put(MESSAGE, "Successfully deleted playlist " + playlistName);
+        }
+        else
+        {
+            responseJson.put(STATUS_CODE, "fail");
+
+            responseJson.put(MESSAGE, "You are not the owner of " + playlistName);
+        }
+
+        writer.println(responseJson);
+
+        ServerApplication.logger.info(responseJson.toString());
+    }
+
+    public void addNewUser(String username, String password)
+    {
+        if(MusicLibrary.addUser(username,password))
+        {
+            responseJson.put(STATUS_CODE, "success");
+
+            responseJson.put(MESSAGE, "user added Successfully");
+        }
+        else
+        {
+            responseJson.put(STATUS_CODE, "fail");
+
+            responseJson.put(MESSAGE, "user already exists");
+        }
+        writer.println(responseJson);
+
+        ServerApplication.logger.info(responseJson.toString());
+
+    }
+
+    public void validateUser(String username, String password)
+    {
+        if(MusicLibrary.validateUser(username,password))
+        {
+            responseJson.put(STATUS_CODE, "success");
+
+            responseJson.put(MESSAGE, "login Successfully");
+        }
+        else
+        {
+            responseJson.put(STATUS_CODE, "fail");
+
+            responseJson.put(MESSAGE, "Invalid credentials");
+        }
+
+        writer.println(responseJson);
+
+        ServerApplication.logger.info(responseJson.toString());
+
     }
 }

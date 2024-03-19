@@ -1,5 +1,9 @@
 package org.vibelite.Server.handler;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.vibelite.Server.ServerApplication;
+
 import static org.vibelite.Server.utils.Constants.*;
 
 import java.io.BufferedReader;
@@ -24,16 +28,20 @@ public class ClientHandler extends Thread
 
         try(BufferedReader receive = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())))
         {
-            while(true)
+            String request;
+            while((request = receive.readLine())!= null)
             {
                 //request type from client
-                var request = receive.readLine();
+
+                ServerApplication.logger.info(request);
+
+                var reqJson = new JSONObject(request);
 
                 // TODO :- make constants for exit. library, audiofile, etc : Done
-                if(request==null || request.equals(REQUEST_EXIT))
+                if(request.equals(REQUEST_EXIT))
                     break;
 
-                switch(request)
+                switch(reqJson.getString(COMMAND))
                 {
                     case REQUEST_LIBRARY:
                         serverRequestHandler.sendLibrary();
@@ -41,17 +49,13 @@ public class ClientHandler extends Thread
 
                     case REQUEST_AUDIO_STREAMING:
                         //audio file name input from client
-                        request = receive.readLine();
-
-                        serverRequestHandler.streamAudioFile(request);
+                        serverRequestHandler.streamAudioFile(reqJson.getString(MESSAGE));
 
                         break;
 
                     case REQUEST_CREATE_PLAYLIST:
                         //playlist name input from client
-                        request = receive.readLine();
-
-                        serverRequestHandler.createPlaylist(request);
+                        serverRequestHandler.createPlaylist(reqJson.getString(MESSAGE), reqJson.getString("username"));
 
                         break;
 
@@ -62,45 +66,43 @@ public class ClientHandler extends Thread
 
                     case REQUEST_ADDTO_PLAYLIST:
                         //audio file name input from client
-                        request = receive.readLine();
-
-                        serverRequestHandler.updateToPlaylist(REQUEST_ADDTO_PLAYLIST,request);
+                        serverRequestHandler.updateToPlaylist(REQUEST_ADDTO_PLAYLIST,reqJson.getString(MESSAGE),reqJson.getString("username"));
 
                         break;
 
                     case REQUEST_REMOVE_FROM_PLAYLIST:
-                        request = receive.readLine();
-
-                        serverRequestHandler.updateToPlaylist(REQUEST_REMOVE_FROM_PLAYLIST,request);
+                        serverRequestHandler.updateToPlaylist(REQUEST_REMOVE_FROM_PLAYLIST,reqJson.getString(MESSAGE), reqJson.getString("username"));
 
                         break;
 
                     case REQUEST_REMOVE_PLAYLIST:
-                        request = receive.readLine();
-
-                        serverRequestHandler.removePlaylist(request);
+                        serverRequestHandler.removePlaylist(reqJson.getString(MESSAGE), reqJson.getString("username"));
 
                         break;
 
                     case REQUEST_PLAYLIST:
                         //playlist name input from client
-                        request = receive.readLine();
-
-                        serverRequestHandler.sendPlaylist(request);
+                        serverRequestHandler.sendPlaylist(reqJson.getString(MESSAGE));
 
                         break;
 
                     case REQUEST_UPLOAD:
-                        request = receive.readLine();
-
-                        serverRequestHandler.saveAudioFile(request);
+                        serverRequestHandler.saveAudioFile(reqJson.getString(MESSAGE));
 
                         break;
 
                     case REQUEST_DOWNLOAD:
-                        request = receive.readLine();
+                        serverRequestHandler.sendAudioFile(reqJson.getString(MESSAGE));
 
-                        serverRequestHandler.sendAudioFile(request);
+                        break;
+
+                    case REGISTER:
+                        serverRequestHandler.addNewUser(reqJson.getString("username"), reqJson.getString("password"));
+
+                        break;
+
+                    case LOGIN:
+                        serverRequestHandler.validateUser(reqJson.getString("username"), reqJson.getString("password"));
 
                         break;
                 }
@@ -108,11 +110,11 @@ public class ClientHandler extends Thread
         }
         catch(IOException e)
         {
-            System.out.println("An IOException occurred. Please check your input or connection." + e.getMessage());
+            ServerApplication.logger.error("An IOException occurred. Please check your input or connection." + e.getMessage());
         }
-        catch(NullPointerException e)
+        catch(JSONException e)
         {
-            System.out.println("(ERROR) entered request is null: ");
+            ServerApplication.logger.error("send request of improper json format");
         }
         finally
         {
@@ -124,7 +126,7 @@ public class ClientHandler extends Thread
             }
             catch(IOException e)
             {
-                System.out.println("(ERROR) client socket is closed");
+                ServerApplication.logger.error("(ERROR) client socket is closed");
             }
         }
     }

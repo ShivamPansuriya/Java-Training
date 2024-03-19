@@ -1,9 +1,12 @@
 package org.vibelite.Server.fileloader;
 
+import org.vibelite.Server.ServerApplication;
+
 import static org.vibelite.Server.utils.Constants.*;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 
 public class MusicLibrary
@@ -12,7 +15,9 @@ public class MusicLibrary
     // TODO :- remove redundant data structure : Done
     private static final Map<String, File> audioFileMapper;
 
-    private static final Map<String, Set<String>> playlistMapper;
+    private static final Map<String,Map<String, Set<String>>> playlistMapper;
+
+    private static final Map<String,String> userAuthData;
 
     static
     {
@@ -20,6 +25,7 @@ public class MusicLibrary
         // TODO - make constant for current_directory and path separator : Done
         //todo - make constant of .mp3 and .wav : Done
         // TODO - make static block : Done
+        userAuthData = new ConcurrentHashMap<>();
 
         playlistMapper = new ConcurrentHashMap<>();
 
@@ -35,49 +41,88 @@ public class MusicLibrary
         }
         System.out.println("Done");
     }
-    public static void createPlaylist(String playlistName)
+    public static boolean createPlaylist(String playlistName, String username)
     {
-        playlistMapper.put(playlistName,new HashSet<>());
+        Map<String, Set<String>> playlistMap = new ConcurrentHashMap<>();
+        playlistMap.put(playlistName + PLAYLIST_SEPARATOR + username, new HashSet<>());
+        playlistMapper.put(username,playlistMap);
+
+        ServerApplication.logger.info("playlist created "+ playlistName);
+
+        return true;
+
     }
 
     public static List<String> getPlayListNames()
     {
-        return playlistMapper.keySet().stream().toList();
+        return playlistMapper.values().stream()           // Stream<Map<String, Set<String>>>
+                .flatMap(userPlaylists -> userPlaylists.keySet().stream())  // Stream<String> of playlist names
+                .collect(Collectors.toList());  // Collect all playlist names into a List
     }
 
-    public static List<String> getPlaylists(String playlistName)
+    public static List<String> getPlaylists(String playlistName, String username)
     {
-        return playlistMapper.get(playlistName).stream().toList();
+
+        return playlistMapper.get(username).get(playlistName).stream().toList();
     }
 
-    public static String updatePlaylist(String command,String playlistName, String audioName)
+    public static boolean updatePlaylist(String command,String playlistName, String audioName, String username)
     {
-        var message = "";
         // TODO - check if object is null or not before performing operation
         if(command.equals(REQUEST_ADDTO_PLAYLIST))
         {
-            playlistMapper.get(playlistName).add(audioName);
+            if(playlistMapper.containsKey(username))
+            {
+                playlistMapper.get(username).get(playlistName + PLAYLIST_SEPARATOR + username).add(audioName);
 
-            message = "Music added to playlist ";
+                System.out.println(playlistMapper);
+
+                ServerApplication.logger.info(audioName + " added to " + playlistName);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         else if(command.equals(REQUEST_REMOVE_FROM_PLAYLIST))
         {
-            playlistMapper.get(playlistName).remove(audioName);
+            if(playlistMapper.containsKey(username))
+            {
+                playlistMapper.get(username).get(playlistName).remove(audioName);
 
-            message = "Music removed from playlist ";
+                ServerApplication.logger.info(audioName + " removed from " + playlistName);
+
+                System.out.println(playlistMapper);
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
-        return  message;
+        return  false;
     }
 
-    public static void updatePlaylist(String playlistName)
+    public static boolean updatePlaylist(String playlistName, String username)
     {
-        playlistMapper.remove(playlistName);
+        if(!playlistMapper.containsKey(username))
+            return false;
+
+        playlistMapper.get(username).remove(playlistName + PLAYLIST_SEPARATOR + username);
+
+        ServerApplication.logger.info(username + " deleted playlist " + playlistName);
+
+        return true;
     }
 
     public static void updateAudioFiles(String audioName)
     {
         //when user upload audio file we will update audioFileMapper
         audioFileMapper.put(audioName,new File(AUDIO_DIRECTORY+audioName));
+
+        ServerApplication.logger.info(audioName + " added to library");
     }
     public static List<String> getAudioFilename()
     {
@@ -91,4 +136,26 @@ public class MusicLibrary
         return audioFileMapper.get(audioName);
     }
 
+    public static boolean addUser(String username, String password)
+    {
+        if(userAuthData.containsKey(username))
+            return false;
+
+        userAuthData.put(username,password);
+
+        ServerApplication.logger.info(username + " registered to application");
+
+        return true;
+    }
+
+    public static boolean validateUser(String username, String password)
+    {
+        if(userAuthData.containsKey(username))
+            if(userAuthData.get(username).equals(password))
+            {
+                ServerApplication.logger.info(username + " logged into application");
+                return true;
+            }
+        return false;
+    }
 }

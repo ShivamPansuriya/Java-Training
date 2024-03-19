@@ -2,6 +2,7 @@ package org.vibelite.client.eventdriven.handler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.vibelite.client.eventdriven.ClientApplication;
 import org.vibelite.client.eventdriven.ui.TerminalUI;
 import static org.vibelite.client.eventdriven.utils.Constants.*;
 
@@ -47,8 +48,15 @@ public class ClientRequestHandler
     public List<String> requestLibrary() throws IOException, NullPointerException
     {
         List<String> audioFiles = new ArrayList<>();
+
+        var jsonRequest = new JSONObject();
+
+        jsonRequest.put(COMMAND,REQUEST_LIBRARY);
         //sending request type
-        request.println(REQUEST_LIBRARY);
+        request.println(jsonRequest);
+
+        ClientApplication.logger.info("request send: " + jsonRequest);
+
         try
         {
             var response = reader.readLine();
@@ -66,6 +74,8 @@ public class ClientRequestHandler
             System.out.println("Server down");
 
             System.out.println("Retrying to establish connection");
+
+            ClientApplication.logger.error("Server down" + NEWLINE + "Retrying to establish connection");
         } finally
         {
             request.close();
@@ -103,6 +113,11 @@ public class ClientRequestHandler
         else
         {
             var playlistTracks = playPlaylist(playedFrom);
+
+            if(playlistTracks == null)
+            {
+                return null;
+            }
             //get size of playlist
             size = playlistTracks.size();
 
@@ -118,17 +133,108 @@ public class ClientRequestHandler
         return audioName;
     }
 
+    public boolean authenticateUser(String command,String username, String password) throws IOException
+    {
+        var jsonRequest = new JSONObject();
+        if(command.equals(LOGIN))
+        {
+            jsonRequest = new JSONObject();
+
+            jsonRequest.put(COMMAND, LOGIN);
+
+            jsonRequest.put("username", username.trim());
+
+            jsonRequest.put("password", password.trim());
+
+            request.println(jsonRequest);
+
+            ClientApplication.logger.info("request send: " + jsonRequest);
+
+            var response = reader.readLine();
+
+            ClientApplication.logger.info("response from server: " + jsonRequest);
+
+            JSONObject resJSON = new JSONObject(response);
+
+            request.close();
+
+            reader.close();
+
+            if(resJSON.getString(STATUS_CODE).equals("success"))
+            {
+                System.out.println(resJSON.getString(MESSAGE));
+
+                return true;
+            }
+            else
+            {
+                System.out.println(resJSON.getString(MESSAGE));
+
+                return false;
+            }
+        }
+        else if(command.equals(REGISTER))
+        {
+            jsonRequest.put(COMMAND, REGISTER);
+
+            jsonRequest.put("username", username.trim());
+
+            jsonRequest.put("password", password.trim());
+
+            request.println(jsonRequest);
+
+            ClientApplication.logger.info("request send: " + jsonRequest);
+
+            var response = reader.readLine();
+
+            ClientApplication.logger.info("response from server: " + jsonRequest);
+
+            JSONObject resJSON = new JSONObject(response);
+
+            request.close();
+
+            reader.close();
+
+            if(resJSON.getString(STATUS_CODE).equals("success"))
+            {
+                System.out.println(resJSON.getString(MESSAGE));
+
+                return true;
+            }
+            else
+            {
+                System.out.println(resJSON.getString(MESSAGE));
+
+                return false;
+            }
+        }
+
+        request.close();
+
+        reader.close();
+
+        return false;
+    }
     public void requestAudio(String audioName, String playedFrom) throws IOException
     {
+        var jsonRequest = new JSONObject();
+
         //sending request type
-        request.println(REQUEST_AUDIO_STREAMING);
+        jsonRequest.put(COMMAND, REQUEST_AUDIO_STREAMING);
 
         //sending actual request
-        request.println(audioName);
+        jsonRequest.put(MESSAGE, audioName);
+
+        request.println(jsonRequest);
+
+        ClientApplication.logger.info("request send: " + jsonRequest);
 
         //start playing audio
         audioStreamer.receiveAndPlayAudio(terminalUI, audioName, playedFrom);
 
+        request.close();
+
+        reader.close();
     }
 
     public void uploadAudio(List<String> library) throws IOException
@@ -181,42 +287,74 @@ public class ClientRequestHandler
             return;
         }
 
-        //sending request type
-        request.println(REQUEST_UPLOAD);
+        var jsonRequest = new JSONObject();
 
-        //sending file name which client is sending
-        request.println(fileName);
+        jsonRequest.put(COMMAND,REQUEST_UPLOAD);
+
+        jsonRequest.put(MESSAGE, fileName);
+
+        //sending request type
+        request.println(jsonRequest);
+
+        ClientApplication.logger.info("request send: " + jsonRequest);
 
         audioStreamer.sendAudioToServer(filePath);
 
-        System.out.println("success");
+        System.out.println("Audio" + fileName + "send Successfully");
     }
 
     public void downloadAudio(String audioName) throws IOException
     {
+        var jsonRequest = new JSONObject();
+
+        jsonRequest.put(COMMAND,REQUEST_DOWNLOAD);
+
+        jsonRequest.put(MESSAGE, audioName);
         //sending request type
-        request.println(REQUEST_DOWNLOAD);
+        request.println(jsonRequest);
 
-        //sending audio name to server that user wants to download
-        request.println(audioName);
-
+        ClientApplication.logger.info("request send: " + jsonRequest);
 
         //converting json object to audio file
         audioStreamer.downloadAudios(audioName);
 
+        ClientApplication.logger.info("Download successful: " + audioName);
 
         request.close();
 
         reader.close();
     }
 
-    public void createPlaylist(String playlistName) throws IOException
-    {
-        //sending request type
-        request.println(REQUEST_CREATE_PLAYLIST);
+    public void createPlaylist(String playlistName, String username) throws IOException
 
-        //sending actual request
-        request.println(playlistName);
+    {
+        var jsonRequest = new JSONObject();
+
+        jsonRequest.put(COMMAND,REQUEST_CREATE_PLAYLIST);
+
+        jsonRequest.put(MESSAGE, playlistName);
+
+        jsonRequest.put("username", username);
+
+        //sending request type
+        request.println(jsonRequest);
+
+        ClientApplication.logger.info("request send: " + jsonRequest);
+
+        var response = reader.readLine();
+
+        ClientApplication.logger.info("response from server: " + jsonRequest);
+
+        JSONObject resJSON = new JSONObject(response);
+
+        if(resJSON.getString(STATUS_CODE).equals("success"))
+        {
+            System.out.println(resJSON.getString(MESSAGE));
+        }
+        else
+        {
+            System.out.println(resJSON.getString(MESSAGE));
+        }
 
         request.close();
 
@@ -226,14 +364,21 @@ public class ClientRequestHandler
 
     public List<String> requestPlaylist() throws IOException
     {
+        var jsonRequest = new JSONObject();
+
+        jsonRequest.put(COMMAND,REQUEST_PLAYLIST_NAMES);
 
         //sending request type
-        request.println(REQUEST_PLAYLIST_NAMES);
+        request.println(jsonRequest);
+
+        ClientApplication.logger.info("request send: " + jsonRequest);
 
         List<String> playlistNames = new ArrayList<>();
         try
         {
             var response = reader.readLine();
+
+            ClientApplication.logger.info("response from server: " + jsonRequest);
 
             JSONObject responseJson = new JSONObject(response);
             //response from server
@@ -250,9 +395,13 @@ public class ClientRequestHandler
 
             System.out.println("Retrying to establish connection");
 
+            ClientApplication.logger.error("Server down" + NEWLINE + "Retrying to establish connection");
+
         } catch(JSONException e)
         {
             System.out.println("cannot read JSON file");
+
+            ClientApplication.logger.error("cannot read JSON file");
         } finally
         {
             request.close();
@@ -264,69 +413,129 @@ public class ClientRequestHandler
         return playlistNames;
     }
 
-    public boolean requestUpdatePlaylist(String requestType, String playlistName, String audioName) throws IOException
+    public boolean requestUpdatePlaylist(String requestType, String playlistName, String audioName , String username) throws IOException
     {
+        var jsonRequest = new JSONObject();
 
-        request.println(requestType);
+        jsonRequest.put(COMMAND,requestType);
 
-        request.println(playlistName + PATH_SEPARATOR + audioName);
+        jsonRequest.put(MESSAGE, playlistName + PATH_SEPARATOR + audioName);
+
+        jsonRequest.put("username", username);
+
+        //sending request type
+        request.println(jsonRequest);
+
+        ClientApplication.logger.info("request send: " + jsonRequest);
 
         try
         {
-            System.out.println(reader.readLine());
+            var response = reader.readLine();
+
+            ClientApplication.logger.info("response from server: " + jsonRequest);
+
+            JSONObject resJSON = new JSONObject(response);
+
+            if(resJSON.getString(STATUS_CODE).equals("success"))
+            {
+                System.out.println(resJSON.getString(MESSAGE));
+            }
+            else
+            {
+                System.out.println(resJSON.getString(MESSAGE));
+            }
         } catch(IOException e)
         {
             System.out.println("Server down");
 
             System.out.println("Retrying to establish connection");
 
+            ClientApplication.logger.error("Server down" + NEWLINE + "Retrying to establish connection");
         }
+        finally
+        {
+            request.close();
 
-        request.close();
-
-        reader.close();
+            reader.close();
+        }
 
         return true;
     }
 
-    public boolean requestUpdatePlaylist(String playlistName) throws IOException
+    public boolean requestUpdatePlaylist(String playlistName, String username) throws IOException
     {
+        var jsonRequest = new JSONObject();
 
-        request.println(REQUEST_REMOVE_PLAYLIST);
+        jsonRequest.put(COMMAND,REQUEST_REMOVE_PLAYLIST);
 
-        request.println(playlistName);
+        jsonRequest.put(MESSAGE, playlistName);
+
+        jsonRequest.put("username", username);
+
+        request.println(jsonRequest);
+
+        ClientApplication.logger.info("request send: " + jsonRequest);
 
         try
         {
-            System.out.println(reader.readLine());
+            var response = reader.readLine();
+
+            ClientApplication.logger.info("response from server: " + jsonRequest);
+
+            JSONObject resJSON = new JSONObject(response);
+
+            if(resJSON.getString(STATUS_CODE).equals("success"))
+            {
+                System.out.println(resJSON.getString(MESSAGE));
+            }
+            else
+            {
+                System.out.println(resJSON.getString(MESSAGE));
+            }
         } catch(IOException e)
         {
             System.out.println("Server down");
 
             System.out.println("Retrying to establish connection");
 
+            ClientApplication.logger.error("Server down" + NEWLINE + "Retrying to establish connection");
+
         }
+        finally
+        {
+            request.close();
 
-
-        request.close();
-
-        reader.close();
+            reader.close();
+        }
 
         return true;
     }
 
     public List<String> playPlaylist(String playlistName) throws IOException
     {
-        //request type
-        request.println(REQUEST_PLAYLIST);
 
-        //sending actual request
-        request.println(playlistName);
+        var jsonRequest = new JSONObject();
+
+        jsonRequest.put(COMMAND,REQUEST_PLAYLIST);
+
+        jsonRequest.put(MESSAGE, playlistName);
+
+        //sending request type
+        request.println(jsonRequest);
+
+        ClientApplication.logger.info("request send: " + jsonRequest);
 
         List<String> playlistTracks = new ArrayList<>();
         try
         {
             String response = reader.readLine();
+
+            ClientApplication.logger.info("response from server: " + response);
+
+            if(response == null)
+            {
+                return null;
+            }
 
             JSONObject responseJson = new JSONObject(response);
 
@@ -340,10 +549,9 @@ public class ClientRequestHandler
         } catch(IOException e)
         {
             System.out.println("(ERROR) Cannot read file: ");
-        } catch(JSONException e)
-        {
-            System.out.println("JSON");
-        } finally
+
+            ClientApplication.logger.error("(ERROR) Cannot read file: ");
+        }finally
         {
             request.close();
 

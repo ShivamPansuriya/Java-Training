@@ -4,11 +4,6 @@ import java.util.Scanner;
 
 public class Constants
 {
-
-    public static final int PORT = 6001;
-
-    public static final String  IP_ADDRESS = "localhost";
-
     public static final int BUFFER_SIZE = 4096; // Buffer size for reading and writing
 
     public static final String NEWLINE = "\n";
@@ -20,6 +15,16 @@ public class Constants
     public static final String FILE_IDENTIFIER = ".";
 
     public static final Scanner INPUT = new Scanner(System.in);
+
+    public static final String REGISTER = "register";
+
+    public static final String LOGIN = "login";
+
+    public static final String COMMAND = "command";
+
+    public static final String STATUS_CODE = "status";
+
+    public static final String MESSAGE = "message";
 
     public static final String LIBRARY_PLAYER_ID = "LIBRARY";
 

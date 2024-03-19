@@ -32,6 +32,11 @@ public class LibraryUI extends TerminalUI
                 audioFiles = clientSocket.connect().playPlaylist(playerName);
 
                 menu(playerName);
+                if(audioFiles == null)
+                {
+                    System.out.println("playlist " + playerName + " has been deleted" + NEWLINE);
+                    return;
+                }
 
                 if(audioFiles.isEmpty())
                 {
@@ -70,7 +75,7 @@ public class LibraryUI extends TerminalUI
                 audioName = validateAudioName(audioName,audioFiles);
 
                 if(!audioName.equals("0"))
-                    if(!clientSocket.connect().requestUpdatePlaylist(REQUEST_REMOVE_FROM_PLAYLIST,playerName, audioName+".wav"))
+                    if(!clientSocket.connect().requestUpdatePlaylist(REQUEST_REMOVE_FROM_PLAYLIST,playerName, audioName+".wav", USER))
                         return;
             }
             else
