@@ -46,12 +46,11 @@ public class TerminalUI
         libraryUI = new LibraryUI();
 
         playlistUI = new PlaylistUI();
+        ClientApplication.logger.info("Application started");
 
         while(true)
         {
-            System.out.println("--------------------------------");
-            System.out.println("\tVIBELITE");
-            System.out.println("--------------------------------");
+            menu(TAB + "VIBELITE");
             System.out.println("1. Login");
             System.out.println("2. Register");
             System.out.println("0. Exit");
@@ -113,14 +112,14 @@ public class TerminalUI
                             }
                             else
                             {
-                                System.out.println("Invalid Input");
+                                System.out.println("Entre password of length >= 6");
                                 ClientApplication.logger.info(USER + " password length less than 6");
                             }
 
                         }
                         else
                         {
-                            System.out.println("Invalid Input");
+                            System.out.println("Entre username length >=6");
                             ClientApplication.logger.info(USER + " username length less than 6");
                         }
                         break;
@@ -128,6 +127,7 @@ public class TerminalUI
                     case "0":
 
                         System.out.println("Exiting client...");
+                        ClientApplication.logger.info(USER + " Closed application");
 
                         return;
 
@@ -159,7 +159,7 @@ public class TerminalUI
         {
             menu("MENU");
 
-            var commandOption = "1) " + PLAYLIST_PLAYER_ID.toLowerCase() + NEWLINE + "2) " + LIBRARY_PLAYER_ID.toLowerCase() + NEWLINE + "3) Upload music" + NEWLINE + "0) Exit from application" + NEWLINE + "Enter Command:";
+            var commandOption = "1) " + PLAYLIST_PLAYER_ID.toLowerCase() + NEWLINE + "2) " + LIBRARY_PLAYER_ID.toLowerCase() + NEWLINE + "3) Upload music" + NEWLINE + "0) Logout" + NEWLINE + "Enter Command:";
 
             System.out.print(commandOption);
 
@@ -187,12 +187,13 @@ public class TerminalUI
                     break;
 
                 case "0":
-                    System.out.println("Exiting....");
+                    System.out.println("Logging out....");
 
                     clientSocket.connect().closeConnection();
 
                     clientSocket.disconnect();
 
+                    ClientApplication.logger.info(USER + " logged out");
                     return;
 
                 default:

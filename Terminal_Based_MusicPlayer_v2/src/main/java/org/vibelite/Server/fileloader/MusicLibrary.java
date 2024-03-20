@@ -110,7 +110,7 @@ public class MusicLibrary
         if(!playlistMapper.containsKey(username))
             return false;
 
-        playlistMapper.get(username).remove(playlistName + PLAYLIST_SEPARATOR + username);
+        playlistMapper.get(username).remove(playlistName);
 
         ServerApplication.logger.info(username + " deleted playlist " + playlistName);
 
