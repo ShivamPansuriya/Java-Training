@@ -61,11 +61,11 @@ public class PlaybackManager
 
         System.out.println("Enter the volume level(0 to 1): ");
 
-        Scanner INPUT = new Scanner(System.in);
+        Scanner input = new Scanner(System.in);
         float volume;
         try
         {
-            volume = INPUT.nextFloat();
+            volume = input.nextFloat();
         }catch(InputMismatchException e){
             System.out.println("Enter proper input");
 

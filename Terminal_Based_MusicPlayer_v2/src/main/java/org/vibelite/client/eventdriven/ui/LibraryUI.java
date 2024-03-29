@@ -43,7 +43,7 @@ public class LibraryUI extends TerminalUI
                     System.out.println("Playlist is empty!!");
                     return;
                 }
-                System.out.print("1) remove music from playlist"+ TAB );
+                System.out.print("1) remove music from playlist" + TAB);
             }
 
             System.out.println("0) EXIT " + playerName);
@@ -51,7 +51,7 @@ public class LibraryUI extends TerminalUI
             // printing audio file name
             for(var audioFile : audioFiles)
             {
-                System.out.println(audioFile.substring(0,audioFile.length()-4));
+                System.out.println(audioFile.substring(0, audioFile.length() - 4));
             }
 
             System.out.print("Enter the music name or command: ");
@@ -72,11 +72,10 @@ public class LibraryUI extends TerminalUI
                 audioName = INPUT.nextLine();
 
                 // checking if music(audio name) actually exists or not
-                audioName = validateAudioName(audioName,audioFiles);
+                audioName = validateAudioName(audioName, audioFiles);
 
-                if(!audioName.equals("0"))
-                    if(!clientSocket.connect().requestUpdatePlaylist(REQUEST_REMOVE_FROM_PLAYLIST,playerName, audioName+".wav", USER))
-                        return;
+                if(!audioName.equals("0") && !clientSocket.connect().requestUpdatePlaylist(REQUEST_REMOVE_FROM_PLAYLIST, playerName, audioName + ".wav", user))
+                    return;
             }
             else
             {
@@ -92,7 +91,8 @@ public class LibraryUI extends TerminalUI
         }
     }
 
-    public String validateAudioName(String audioName, List<String> audioFiles){
+    public String validateAudioName(String audioName, List<String> audioFiles)
+    {
         // validate audio name
         while(!audioFiles.contains(audioName + ".wav"))
         {

@@ -1,54 +1,25 @@
 package org.vibelite.client.eventdriven.connection;
 
-import org.json.JSONObject;
+import static org.vibelite.client.eventdriven.utils.Constants.*;
+
 import org.vibelite.client.eventdriven.ClientApplication;
 import org.vibelite.client.eventdriven.handler.ClientRequestHandler;
+import org.vibelite.client.eventdriven.ui.TerminalUI;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 
 public class ClientSocket
 {
-    private final int serverPort;
+    private  Socket socket;
 
-    private final String serverIP;
+    private TerminalUI terminalUI;
 
-    private Socket socket;
-
-    public ClientSocket()
+    public ClientSocket(TerminalUI terminalUI)
     {
-        var config = loadConfig();
-
-        serverIP = config.getString("IP");
-
-        serverPort = config.getInt("PORT");
+        this.terminalUI = terminalUI;
     }
-
-    private JSONObject loadConfig()
-    {
-        try(var inputStream = new FileInputStream("config.json"))
-        {
-            var buffer = inputStream.readAllBytes();
-
-            var jsonText = new String(buffer);
-
-            ClientApplication.logger.info("read config file: " + jsonText);
-
-            return new JSONObject(jsonText);
-
-        }
-        catch(IOException e)
-        {
-            System.out.println("Error reading configuration file: ");
-
-            ClientApplication.logger.error("Error reading configuration file: " + e.getMessage());
-
-            return new JSONObject();
-        }
-    }
-
 
     public ClientRequestHandler connect()
     {
@@ -57,19 +28,21 @@ public class ClientSocket
         try
         {
             //establish connection with server
-            socket = new Socket(serverIP, serverPort);
+            socket = new Socket(IP_ADDRESS,PORT);
 
             // create single clientRequestHandler object
-            requestHandler = new ClientRequestHandler(socket);
+            requestHandler = new ClientRequestHandler(socket, terminalUI);
 
-        } catch(IOException e)
+        }
+        catch(IOException e)
         {
             System.out.println("Server you are trying to connect is not available");
 
             try
             {
                 Thread.sleep(5000);
-            } catch(InterruptedException ex)
+            }
+            catch(InterruptedException ex)
             {
                 System.out.println("(FATAL ERROR)");
                 ClientApplication.logger.error("reconnect sleep interrupted");
@@ -78,12 +51,12 @@ public class ClientSocket
         return requestHandler;
     }
 
-    public void disconnect()
-    {
+    public void disconnect() {
         try
         {
             socket.close();
-        } catch(IOException e)
+        }
+        catch (IOException e)
         {
             System.out.println("Cannot disconnect socket connection");
             ClientApplication.logger.error("Cannot disconnect socket connection");

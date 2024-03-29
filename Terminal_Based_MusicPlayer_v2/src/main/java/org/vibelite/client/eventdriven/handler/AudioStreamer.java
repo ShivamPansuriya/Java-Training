@@ -1,5 +1,6 @@
 package org.vibelite.client.eventdriven.handler;
 
+import org.vibelite.client.eventdriven.ClientApplication;
 import org.vibelite.client.eventdriven.ui.TerminalUI;
 import static org.vibelite.client.eventdriven.utils.Constants.*;
 
@@ -35,7 +36,7 @@ public class AudioStreamer
             //this will prepare audio to e ready to play
             clip.open(audioInputStream);
 
-            terminalUI.AudioPlayerUI(clip, audioName, playedFrom);
+            terminalUI.audioPlayerUI(clip, audioName, playedFrom);
 
         } catch(IOException e)
         {
@@ -53,13 +54,13 @@ public class AudioStreamer
     public void downloadAudios(String audioName)
     {
 
-        // Get the input stream from the server
-        try(InputStream inputStream = clientSocket.getInputStream())
-        {
-            // Write the received data to a file
-            String outputFilePath = "./" + audioName;
+        // Write the received data to a file
+        String outputFilePath = "./" + audioName;
 
-            FileOutputStream fileOutputStream = new FileOutputStream(outputFilePath);
+        // Get the input stream from the server
+        try(InputStream inputStream = clientSocket.getInputStream() ;
+            FileOutputStream fileOutputStream = new FileOutputStream(outputFilePath))
+        {
 
             byte[] buffer = new byte[BUFFER_SIZE];
 
@@ -70,15 +71,13 @@ public class AudioStreamer
                 fileOutputStream.write(buffer, 0, bytesRead);
             }
 
-            fileOutputStream.close();
-
             System.out.println("File received and saved to " + outputFilePath);
 
         } catch(IOException e)
         {
-            System.out.println("Server down");
+            System.out.println(SERVER_DOWN_MESSAGE);
 
-            System.out.println("Retrying to establish connection");
+            ClientApplication.logger.error(SERVER_DOWN_MESSAGE);
         }
     }
 

@@ -3,14 +3,11 @@ package org.vibelite.client.eventdriven.ui;
 import org.json.JSONException;
 import org.vibelite.client.eventdriven.ClientApplication;
 import org.vibelite.client.eventdriven.connection.ClientSocket;
-import org.vibelite.client.eventdriven.handler.ClientRequestHandler;
 import org.vibelite.client.eventdriven.handler.PlaybackManager;
 
-import static org.vibelite.Server.utils.Constants.PLAYLIST_SEPARATOR;
 import static org.vibelite.client.eventdriven.utils.Constants.*;
 
 import javax.sound.sampled.Clip;
-import javax.sound.sampled.DataLine;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -19,7 +16,7 @@ public class TerminalUI
 {
     protected final ClientSocket clientSocket;
 
-    protected static String USER;
+    protected static String user;
     private static final PlaybackManager playbackManager;
 
     // used to decide whether to empty playing queue or not.
@@ -36,21 +33,20 @@ public class TerminalUI
 
     public TerminalUI()
     {
-        this.clientSocket = new ClientSocket();
+        this.clientSocket = new ClientSocket(this);
     }
 
     public void start()
     {
-        ClientRequestHandler.terminalUI = this;
-
         libraryUI = new LibraryUI();
 
         playlistUI = new PlaylistUI();
-        ClientApplication.logger.info("Application started");
 
         while(true)
         {
-            menu(TAB + "VIBELITE");
+            System.out.println("--------------------------------");
+            System.out.println("\tVIBELITE");
+            System.out.println("--------------------------------");
             System.out.println("1. Login");
             System.out.println("2. Register");
             System.out.println("0. Exit");
@@ -59,9 +55,9 @@ public class TerminalUI
             try
             {
 
-                Scanner INPUT = new Scanner(System.in);
+                Scanner input = new Scanner(System.in);
 
-                var choice = INPUT.nextLine();
+                var choice = input.nextLine();
 
                 var username = "";
 
@@ -75,17 +71,17 @@ public class TerminalUI
 
                         System.out.print("Enter username: ");
 
-                        username = INPUT.next();
+                        username = input.next();
 
                         System.out.print("Enter password: ");
 
-                        password = INPUT.next();
+                        password = input.next();
 
                         if(clientSocket.connect().authenticateUser(LOGIN, username, password))
                         {
-                            USER = username;
+                            user = username;
 
-                            ClientApplication.logger.info(USER + " logged in");
+                            ClientApplication.logger.info(user, "{} logged in");
 
                             startTerminal();
 
@@ -98,13 +94,13 @@ public class TerminalUI
 
                         System.out.print("Enter username: ");
 
-                        username = INPUT.next();
+                        username = input.next();
 
                         if(username.length() >= 6)
                         {
                             System.out.print("Enter password: ");
 
-                            password = INPUT.next();
+                            password = input.next();
 
                             if(password.length() >= 6)
                             {
@@ -112,22 +108,21 @@ public class TerminalUI
                             }
                             else
                             {
-                                System.out.println("Entre password of length >= 6");
-                                ClientApplication.logger.info(USER + " password length less than 6");
+                                System.out.println("Invalid Input");
+                                ClientApplication.logger.info(user, "{} password length less than 6");
                             }
 
                         }
                         else
                         {
-                            System.out.println("Entre username length >=6");
-                            ClientApplication.logger.info(USER + " username length less than 6");
+                            System.out.println("Invalid Input");
+                            ClientApplication.logger.info(user, "{} username length less than 6");
                         }
                         break;
 
                     case "0":
 
                         System.out.println("Exiting client...");
-                        ClientApplication.logger.info(USER + " Closed application");
 
                         return;
 
@@ -159,7 +154,7 @@ public class TerminalUI
         {
             menu("MENU");
 
-            var commandOption = "1) " + PLAYLIST_PLAYER_ID.toLowerCase() + NEWLINE + "2) " + LIBRARY_PLAYER_ID.toLowerCase() + NEWLINE + "3) Upload music" + NEWLINE + "0) Logout" + NEWLINE + "Enter Command:";
+            var commandOption = "1) " + PLAYLIST_PLAYER_ID.toLowerCase() + NEWLINE + "2) " + LIBRARY_PLAYER_ID.toLowerCase() + NEWLINE + "3) Upload music" + NEWLINE + "0) Exit from application" + NEWLINE + "Enter Command:";
 
             System.out.print(commandOption);
 
@@ -193,7 +188,6 @@ public class TerminalUI
 
                     clientSocket.disconnect();
 
-                    ClientApplication.logger.info(USER + " logged out");
                     return;
 
                 default:
@@ -211,11 +205,12 @@ public class TerminalUI
         System.out.println("-------------------------------");
     }
 
-    public void AudioPlayerUI(Clip clip, String audioName, String playedFrom) throws IOException
+    public void audioPlayerUI(Clip clip, String audioName, String playedFrom) throws IOException
     {
         if(!previousPlayerName.equals(playedFrom))
         {
             playbackManager.resetQueue();
+
             previousPlayerName = playedFrom;
         }
 
@@ -285,10 +280,10 @@ public class TerminalUI
                     var playlistNames = clientSocket.connect().requestPlaylist();
 
                     //check whether playlist exist or not
-                    if(playlistNames.contains(command+ PLAYLIST_SEPARATOR + USER))
+                    if(playlistNames.contains(command + ":" + user))
                     {
                         //check if the given input is valid playlist name
-                        while(!clientSocket.connect().requestUpdatePlaylist(REQUEST_ADDTO_PLAYLIST, command, playbackManager.getAudio(), USER))
+                        while(!clientSocket.connect().requestUpdatePlaylist(REQUEST_ADDTO_PLAYLIST, command, playbackManager.getAudio(), user))
                         {
                             System.out.print("enter correct playlist name or 0 to exit: ");
 

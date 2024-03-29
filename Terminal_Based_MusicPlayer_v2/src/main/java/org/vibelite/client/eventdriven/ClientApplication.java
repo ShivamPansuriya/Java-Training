@@ -4,10 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
-import org.vibelite.Server.ServerApplication;
 import org.vibelite.client.eventdriven.ui.TerminalUI;
-
-import java.io.IOException;
 
 public class ClientApplication
 {
@@ -22,7 +19,7 @@ public class ClientApplication
 
         try
         {
-            terminalUI.start();//terminalUI.start();
+            terminalUI.start();
         } catch(NullPointerException e)
         {
             System.out.println("server is down");

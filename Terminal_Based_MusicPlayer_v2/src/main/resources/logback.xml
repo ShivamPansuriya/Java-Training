@@ -34,7 +34,7 @@
     </logger>
 
     <!-- Logger for Server -->
-    <logger name="org.vibelite.Server.ServerApplication" level="info" additivity="false">
+    <logger name="org.vibelite.server.ServerApplication" level="info" additivity="false">
         <appender-ref ref="FILE_SERVER" />
     </logger>
 </configuration>

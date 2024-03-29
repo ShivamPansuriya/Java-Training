@@ -1,6 +1,5 @@
 package org.vibelite.client.eventdriven.ui;
 
-import org.vibelite.client.eventdriven.connection.ClientSocket;
 import static org.vibelite.client.eventdriven.utils.Constants.*;
 
 import java.io.IOException;
@@ -55,7 +54,7 @@ public class PlaylistUI extends TerminalUI
                         playlistName = INPUT.nextLine();
                     }
 
-                    clientSocket.connect().createPlaylist(playlistName, USER);
+                    clientSocket.connect().createPlaylist(playlistName, user);
 
                     break;
 
@@ -96,7 +95,7 @@ public class PlaylistUI extends TerminalUI
                     //validate if playlist is already available or not
                     if(playlist.contains(playlistName))
                     {
-                        while(!clientSocket.connect().requestUpdatePlaylist(playlistName, USER))
+                        while(!clientSocket.connect().requestUpdatePlaylist(playlistName, user))
                         {
                             System.out.print("enter correct playlist name or 0 to exit: ");
 
