@@ -1,0 +1,9 @@
+
+œ	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(Êä İ8ƒßšŒì1J$4d613111-ff71-4d86-ad4c-bda7144c24ad
+t
+java:S1602",Remove useless curly braces around statement(ÕÚ§äúÿÿÿÿ8É²œŒì1J$bb38f78d-1cac-40e5-a70a-e9416f492baa
+r	java:S106"+Replace this use of System.out by a logger.(î“¿üüÿÿÿÿ8œßšŒì1J$b57a7d47-0e81-4dba-aca4-8947181907c2
+m	java:S106"+Replace this use of System.out by a logger.(òñáÄ8Ğ²œŒì1J$6dda95cd-d2f4-49dc-a3e2-2b16f915e16e
+m	java:S106 "+Replace this use of System.out by a logger.(ŞÕºÍ8ËàŒì1J$973a7f9b-eb99-4651-8f21-de6488d48247
+o
+java:S1128",Remove this unused import 'java.nio.Buffer'.(î¦Ïî8ŸßšŒì1J$e7da8fe7-beb5-48a2-bb71-75b73abf8462
