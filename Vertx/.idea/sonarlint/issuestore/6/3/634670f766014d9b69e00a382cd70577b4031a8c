@@ -1,0 +1,8 @@
+
+g
+java:S2629 "$Invoke method(s) only conditionally.(€ 8äòó¼ì1J$96ecae8e-19db-4be7-8637-18a315fbe886
+¡	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(—¨üÁıÿÿÿÿ8æòó¼ì1J$e2b89cfa-7ba2-4208-a512-0691699c49a7
+z
+java:S1874"7Remove this use of "executeBlocking"; it is deprecated.(Ôşü8‚»õ¼ì1J$85455289-00e7-4bb6-b8ad-e45fac308c7d
+¡
+java:S2142"^Either re-interrupt this method or rethrow the "InterruptedException" that can be caught here.(ä ¹€8Šóó¼ì1J$283aa75c-0258-433a-9452-0ffd74df29b0

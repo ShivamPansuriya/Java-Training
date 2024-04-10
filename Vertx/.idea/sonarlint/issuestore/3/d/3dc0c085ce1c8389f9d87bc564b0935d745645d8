@@ -1,0 +1,9 @@
+
+	java:S112"FDefine and throw a dedicated exception instead of using a generic one.(¦Úÿúÿÿÿÿ8øµë½ì1J$e24e9417-2179-463d-89cd-e176a93e95cf
+¡	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(à‘Óıÿÿÿÿ8üµë½ì1J$608b7d6b-f92d-497f-809d-0b0c8f1e1923
+o
+java:S1602",Remove useless curly braces around statement(®ÆÈæ8—¶ë½ì1J$e3e7b040-f995-45a7-9a41-9744159add53
+l
+java:S1905")Remove this unnecessary cast to "String".(¯ßã8óÓì½ì1J$ee48dcbf-4cfb-4301-b7ad-5918b0972b97
+€
+java:S1128"=Remove this unused import 'Verticles.worker.ExecuteBlocking'.(Š³æİ8¯Óú¿ì1J$f725fafc-9953-43b2-8c4e-23730a57b7f3
