@@ -14,10 +14,13 @@ public class TcpServer
 
         NetServer netServer = vertx.createNetServer(new NetServerOptions().setPort(5555));
 
-        netServer.connectHandler(socket -> {
-            socket.handler(buffer -> {
+        netServer.connectHandler(socket ->
+        {
+            socket.handler(buffer ->
+            {
 
                 System.out.println("I received some bytes: " + buffer.length());
+
                 socket.write("hello client \n");
             });
         });

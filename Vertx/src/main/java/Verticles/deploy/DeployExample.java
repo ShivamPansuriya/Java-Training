@@ -6,9 +6,7 @@ import io.vertx.core.Launcher;
 import io.vertx.core.ThreadingModel;
 import io.vertx.core.json.JsonObject;
 
-/*
- * @author <a href="http://tfox.org">Tim Fox</a>
- */
+
 public class DeployExample extends AbstractVerticle {
 
     public static void main(String[] args) {
@@ -20,12 +18,10 @@ public class DeployExample extends AbstractVerticle {
 
         System.out.println("Main verticle has started, let's deploy some others...");
 
-        // Different ways of deploying verticles
 
-        // Deploy a verticle and don't wait for it to start
         vertx.deployVerticle("Verticles.deploy.OtherVerticle");
 
-        // Deploy another instance and  wait for it to start
+
         vertx.deployVerticle("Verticles.deploy.OtherVerticle", res -> {
             if (res.succeeded()) {
 
@@ -33,9 +29,6 @@ public class DeployExample extends AbstractVerticle {
 
                 System.out.println("Other verticle deployed ok, deploymentID = " + deploymentID);
 
-                // You can also explicitly undeploy a verticle deployment.
-                // Note that this is usually unnecessary as any verticles deployed by a verticle will be automatically
-                // undeployed when the parent verticle is undeployed
 
                 vertx.undeploy(deploymentID, res2 -> {
                     if (res2.succeeded()) {
@@ -50,7 +43,7 @@ public class DeployExample extends AbstractVerticle {
             }
         });
 
-        // Deploy specifying some config
+        // Deploy with config
         JsonObject config = new JsonObject().put("foo", "bar");
         vertx.deployVerticle("Verticles.deploy.OtherVerticle", new DeploymentOptions().setConfig(config));
 

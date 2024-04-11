@@ -4,9 +4,6 @@ package Verticles.asyncstart;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Launcher;
 
-/*
- * @author <a href="http://tfox.org">Tim Fox</a>
- */
 public class DeployExample extends AbstractVerticle
 {
 
@@ -21,7 +18,6 @@ public class DeployExample extends AbstractVerticle
 
         System.out.println("Main verticle has started, let's deploy some others...");
 
-        // Deploy another instance and  want for it to start
         vertx.deployVerticle("Verticles.asyncstart.OtherVerticle", res -> {
             if(res.succeeded())
             {

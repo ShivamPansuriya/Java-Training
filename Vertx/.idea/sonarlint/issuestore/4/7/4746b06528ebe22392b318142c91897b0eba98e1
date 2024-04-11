@@ -1,9 +1,6 @@
 
-œ	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(Êä İ8ƒßšŒì1J$4d613111-ff71-4d86-ad4c-bda7144c24ad
+œ	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(Êä İ8ƒßšŒì1J$9d2a39cb-6cd9-41ce-8826-034d25babd19
 t
-java:S1602",Remove useless curly braces around statement(ÕÚ§äúÿÿÿÿ8É²œŒì1J$bb38f78d-1cac-40e5-a70a-e9416f492baa
-r	java:S106"+Replace this use of System.out by a logger.(î“¿üüÿÿÿÿ8œßšŒì1J$b57a7d47-0e81-4dba-aca4-8947181907c2
-m	java:S106"+Replace this use of System.out by a logger.(òñáÄ8Ğ²œŒì1J$6dda95cd-d2f4-49dc-a3e2-2b16f915e16e
-m	java:S106 "+Replace this use of System.out by a logger.(ŞÕºÍ8ËàŒì1J$973a7f9b-eb99-4651-8f21-de6488d48247
+java:S1602",Remove useless curly braces around statement(ÒÌâ–øÿÿÿÿ8É²œŒì1J$61caddf7-dcb0-4bc8-bd3a-d043ea1d4f3d
 o
-java:S1128",Remove this unused import 'java.nio.Buffer'.(î¦Ïî8ŸßšŒì1J$e7da8fe7-beb5-48a2-bb71-75b73abf8462
+java:S1128",Remove this unused import 'java.nio.Buffer'.(î¦Ïî8ŸßšŒì1J$6a0c270a-0f69-4b9e-a1e6-53109a22657a

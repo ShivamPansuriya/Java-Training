@@ -1,10 +1,8 @@
 
 ‰
-java:S1192"FDefine a constant instead of duplicating this literal "./foo" 3 times.(øÀØ”8 ïéáë1J$cc038662-449a-457c-8744-bc8743c7a88e
-”	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(şÌµ`J$d2922bfd-a3ae-49fb-b7c2-81281ebfc571
+java:S1192"FDefine a constant instead of duplicating this literal "./foo" 3 times.(øÀØ”8 ïéáë1J$f7bfde9e-daeb-4b91-9db5-e6f771090950
+”	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(şÌµ`J$b0d179f6-e17e-4c68-b8bf-f7e9667264d8
 ›
-java:S1602"SRemove useless curly braces around statement and then remove useless return keyword(ÃªßÖøÿÿÿÿ8ˆÑàáë1J$a4b5cfdb-6681-4546-9455-7e48afddaa3b
+java:S1602"SRemove useless curly braces around statement and then remove useless return keyword(ÒÌâ–øÿÿÿÿ8ˆÑàáë1J$bfab209a-2b76-48d3-a9d3-a933535dda87
 ›
-java:S1602"SRemove useless curly braces around statement and then remove useless return keyword(ÃªßÖøÿÿÿÿ8‰Ñàáë1J$5a672cfd-ef07-457f-88be-f92a46815b9b
-r	java:S106!"+Replace this use of System.out by a logger.(è‡Ššúÿÿÿÿ8Ñàáë1J$65dfaed6-72d6-4f61-a5a1-2868b37bb25d
-l	java:S106#"+Replace this use of System.err by a logger.(äçõg8Ñàáë1J$1e42411c-5c33-44ae-a9fe-97ae62f81a5d
+java:S1602"SRemove useless curly braces around statement and then remove useless return keyword(ÒÌâ–øÿÿÿÿ8‰Ñàáë1J$76324ab5-9ed1-43f0-a764-7dec3a43afb8

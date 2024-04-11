@@ -12,8 +12,10 @@ public class HttpServers
 
         HttpServer server = vertx.createHttpServer();
 
-        server.requestHandler(req->{
+        server.requestHandler(req->
+        {
             req.response().end("<h1>Hello there</h1>");
+
             System.out.println(req.path() + "\n" + req.uri());
         });
 

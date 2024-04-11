@@ -1,14 +1,16 @@
 package Futures;
 
 import io.vertx.core.Future;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-public class FutrreFromCompleteStage {
-    public static void main(String[] args) {
-        // Create a CompletionStage
-        CompletionStage<String> completionStage = CompletableFuture.supplyAsync(() -> {
-            // Simulate an asynchronous operation
+public class FutrreFromCompleteStage
+{
+    public static void main(String[] args)
+    {
+        CompletionStage<String> completionStage = CompletableFuture.supplyAsync(() ->
+        {
             return "Hello, Vert.x!";
         });
 
@@ -16,9 +18,11 @@ public class FutrreFromCompleteStage {
         Future<String> future = Future.fromCompletionStage(completionStage);
 
         // Handle the Future
-        future.onSuccess(result -> {
+        future.onSuccess(result ->
+        {
             System.out.println("Result: " + result);
-        }).onFailure(err -> {
+        }).onFailure(err ->
+        {
             System.err.println("Error: " + err.getMessage());
         });
     }

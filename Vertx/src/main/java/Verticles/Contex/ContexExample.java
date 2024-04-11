@@ -1,6 +1,5 @@
 package Verticles.Contex;
 
-import Verticles.worker.ExecuteBlocking;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;

@@ -1,7 +1,4 @@
 
 Ά
-java:S1192"_Define a constant instead of duplicating this literal "Verticles.deploy.OtherVerticle" 5 times.(ƒΞ¬Ύ8©Ξ–μ1J$fa11780a-cc1d-46e1-89fb-35555c6bef52
-”	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(πε¬J$b49ea9c3-7fbb-42ae-ae69-4d1d4f631066
-r	java:S106"+Replace this use of System.out by a logger.(¶ίγϊÿÿÿÿ8γµ–μ1J$4d86a722-ed72-41e9-bbea-e573e0e0d37a
-m	java:S106""+Replace this use of System.out by a logger.(Π½¥Λ8γµ–μ1J$2777b6dc-bee0-44ca-b415-e56e1ed12802
-m	java:S106*"+Replace this use of System.out by a logger.(¤ο”΄8‹γµ–μ1J$5d163052-3405-4611-9b53-254609f7c603
+java:S1192"_Define a constant instead of duplicating this literal "Verticles.deploy.OtherVerticle" 5 times.(ƒΞ¬Ύ8όόϋΫμ1J$7bc6f4e1-fb21-49c2-aa07-1cc04f916339
+”	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(πε¬J$67001ffb-40dd-439b-85b0-a523818c9675
