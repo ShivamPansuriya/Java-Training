@@ -1,6 +1,7 @@
 package EventBus;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 
 import java.util.Random;

@@ -14,7 +14,8 @@ public class HttpServers
 
         server.requestHandler(req->
         {
-            req.response().end("<h1>Hello there</h1>");
+            req.response()
+                    .end("<h1>Hello there</h1>");
 
             System.out.println(req.path() + "\n" + req.uri());
         });
