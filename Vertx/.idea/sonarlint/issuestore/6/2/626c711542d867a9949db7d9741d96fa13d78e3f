@@ -1,0 +1,8 @@
+
+	java:S112"FDefine and throw a dedicated exception instead of using a generic one.(Ò‚Òéüÿÿÿÿ8¹¾Ã„î1J$60cbe853-9598-4d8d-929e-6a9c9ba9ba85
+	java:S101"MRename this class name to match the regular expression '^[A-Z][a-zA-Z0-9]*$'.(ıÛÔÓ8º¾Ã„î1J$b8a0585c-fa2b-45b9-a58c-cc23e0f0f835
+œ	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(ºÅÙç8»¾Ã„î1J$fb3b5dae-fa55-4eda-bca1-6ce2577f6cb2
+¦
+java:S2142"^Either re-interrupt this method or rethrow the "InterruptedException" that can be caught here.(ŠÏ¢²üÿÿÿÿ8Å¾Ã„î1J$50ea3dee-ce2a-4eba-8295-0fdeadb9b743
+‰
+java:S1128"ARemove this unused import 'io.vertx.core.http.HttpServerOptions'.(Û“¶Ûüÿÿÿÿ8É¾Ã„î1J$3842e83f-9f9c-455a-9ca3-00d123f4c147

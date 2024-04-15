@@ -1,0 +1,10 @@
+
+š	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(¾µŞıÿÿÿÿJ$49bc3301-5cf5-43ba-bf9e-2e38614aee73
+|
+java:S1161":Add the "@Override" annotation above this method signature(÷Á28ÑÀ³î1J$df002046-598a-4c02-87c3-0c0a6faea118
+t
+java:S1602(",Remove useless curly braces around statement(ÒÌâ–øÿÿÿÿ8ÔÀ³î1J$d2523ace-b60c-47c4-b08f-429a33532392
+~
+java:S1612'"6Replace this lambda with method reference 'ctx::fail'.(Á™ò¾úÿÿÿÿ8ÕÀ³î1J$2cfe7fd6-c74d-4c99-a662-cce9c9c225a9
+‚
+java:S1128	":Remove this unused import 'io.vertx.core.http.HttpServer'.(§Öá‰üÿÿÿÿ8ì¥·î1J$97ad62dd-d10f-430a-929f-f1f23853c47c
