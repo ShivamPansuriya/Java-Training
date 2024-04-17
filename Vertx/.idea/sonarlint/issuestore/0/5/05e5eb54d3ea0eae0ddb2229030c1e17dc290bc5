@@ -1,8 +1,0 @@
-
-”	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(şÌµ`J$66482d36-42b3-4fa7-a34c-7c253ff8d548
-›
-java:S1602"SRemove useless curly braces around statement and then remove useless return keyword(ÒÌâ–øÿÿÿÿ8Ú§µãë1J$de24fd00-3a2a-4ca0-a5b3-110ec98d54c6
-t
-java:S1602",Remove useless curly braces around statement(ÒÌâ–øÿÿÿÿ8×¡îÛì1J$05a4fe21-71fa-4d89-84e1-55d98c72328b
-N
-java:S1602",Remove useless curly braces around statement(ÒÌâ–øÿÿÿÿ8ş“ïÛì1

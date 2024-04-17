@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SockJS Event Bus Bridge Example</title>
+    <!-- Include SockJS library -->
+    <script src="https://unpkg.io/sockjs-client@1.5.0/dist/sockjs.min.js"></script>
+    <script src='https://unpkg.io/@vertx/eventbus-bridge-client.js@1.0.0-1/vertx-eventbus.js'></script>
+
+</head>
+<body>
+<h1>SockJS Event Bus Bridge Example</h1>
+
+<script>
+    // Connect to the SockJS event bus bridge
+    const eb = new EventBus('http://10.20.40.239:8080/eventbus/');
+
+    // Register handlers for incoming messages
+    eb.onopen = function () {
+        console.log('Connected to the event bus');
+        // Register a handler for messages on a specific address
+        eb.registerHandler('someAddresstosend', function (error, message) {
+            if (error) {
+                console.error('Error registering handler:', error);
+            } else {
+                console.log('Received message:', message.body);
+            }
+        });
+
+        sendMessage();
+    };
+
+    // Send a message to the server
+    function sendMessage() {
+        eb.send('someAddress', 'Hello from client!');
+    }
+</script>
+</body>
+</html>
